@@ -1,10 +1,10 @@
-package misc;
+package guitest;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 
-public class Test extends JFrame implements ActionListener{
+public class Converter extends JFrame implements ActionListener{
 
     public final int btn_x = 100, btn_y = 30;
 
@@ -12,13 +12,13 @@ public class Test extends JFrame implements ActionListener{
     public JLabel l1, l2, l3;
     public JTextField in1, in2, in3;
 
-    public Test() {
+    public Converter() {
         getContentPane().setLayout(new BorderLayout());
         Dimension btnsize = new Dimension(btn_x, btn_y);
 
-        b1 = new JButton("Button 1");
-        b2 = new JButton("Button 2");
-        b3 = new JButton("Button 3");
+        b1 = new JButton("Convert");
+        b2 = new JButton("Convert");
+        b3 = new JButton("Convert");
         JButton[] buttons = {b1, b2, b3};
 
         l1 = new JLabel("Decimal");
@@ -99,7 +99,7 @@ public class Test extends JFrame implements ActionListener{
     }
 
     public static void main(String[] args) {
-        Test gui = new Test();
+        Converter gui = new Converter();
 
         gui.setTitle("JavaGUI");
         gui.setSize(600,150);
