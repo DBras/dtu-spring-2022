@@ -43,6 +43,7 @@ public class Tictactoegui extends JFrame implements ActionListener{
 
         for (int i = 0; i < 9; i++) {
             JButton button = new JButton(".");
+            button.setFont(new Font("Serif",Font.BOLD,30));
             buttons[i] = button;
             buttons[i].setAlignmentX(Component.CENTER_ALIGNMENT);
             buttons[i].addActionListener(this); // Centers all buttons and adds action listeners
@@ -127,7 +128,7 @@ public class Tictactoegui extends JFrame implements ActionListener{
     public static void main(String[] args) {
         Tictactoegui gamegui = new Tictactoegui();
         gamegui.setTitle("JavaGUI");
-        gamegui.setSize(150, 150);
+        gamegui.setSize(450, 450);
         gamegui.setResizable(false);
         gamegui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gamegui.setVisible(true); // Initialise the game board. Only does this once, as it is reused if
