@@ -1,7 +1,5 @@
 package asyncgui;
 
-import org.w3c.dom.css.Rect;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -11,7 +9,7 @@ public class Main extends JFrame implements ActionListener {
 
     JTextArea prime_area;
     JButton quit_button;
-    Rectangle rectangle_field;
+    RectangleFrame rectangle_field;
 
     public Main() {
         getContentPane().setLayout(new BorderLayout());
@@ -23,7 +21,7 @@ public class Main extends JFrame implements ActionListener {
         prime_area.setAlignmentX(Component.CENTER_ALIGNMENT);
         prime_area.setLineWrap(true);
 
-        rectangle_field = new Rectangle(1000, 500);
+        rectangle_field = new RectangleFrame(1000, 500);
         rectangle_field.setPreferredSize(new Dimension(1000, 500));
         rectangle_field.setLayout(new BorderLayout());
 
@@ -49,10 +47,13 @@ public class Main extends JFrame implements ActionListener {
         gui.setResizable(false);
         gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gui.setVisible(true);
-        gui.rectangle_field.specificPaint();
 
         PrimeRunnable primerunnable = new PrimeRunnable(gui);
         Thread t = new Thread(primerunnable);
         t.start();
+
+        RectangleRunnable rectangle_runnable = new RectangleRunnable(gui);
+        Thread rectangle_thread = new Thread(rectangle_runnable);
+        rectangle_thread.start();
     }
 }

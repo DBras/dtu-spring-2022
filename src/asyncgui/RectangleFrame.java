@@ -5,7 +5,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
-public class Rectangle extends JPanel {
+public class RectangleFrame extends JPanel {
     private BufferedImage img;
     private Random r = new Random();
     private int h, w;
@@ -13,7 +13,7 @@ public class Rectangle extends JPanel {
                                 Color.LIGHT_GRAY, Color.MAGENTA, Color.ORANGE, Color.PINK, Color.RED,
                                 Color.YELLOW} ;
 
-    public Rectangle(int w, int h) {
+    public RectangleFrame(int w, int h) {
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
         this.w = w;
         this.h = h;
@@ -34,10 +34,14 @@ public class Rectangle extends JPanel {
         return img;
     }
 
-    public void specificPaint() {
+    public void drawRandomRectangle() {
         Graphics g = img.getGraphics();
+        int randomX = r.nextInt(this.h);
+        int randomY = r.nextInt(this.w);
+        int randomHeight = r.nextInt(this.h - randomX);
+        int randomWidth = r.nextInt(this.w - randomY);
         g.setColor(colors[r.nextInt(colors.length)]);
-        g.fillRect(50, 50, 50, 50);
+        g.fillRect(randomX, randomY, randomWidth, randomHeight);
         g.dispose();
         repaint();
     }
