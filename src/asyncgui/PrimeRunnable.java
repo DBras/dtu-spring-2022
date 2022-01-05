@@ -29,7 +29,7 @@ public class PrimeRunnable implements Runnable {
                 }
             }
             if (is_prime) {
-                parent.prime_area.setText(parent.prime_area.getText() + Integer.toString(number) + " ");
+                parent.prime_area.append(Integer.toString(number) + " ");
             }
             number++;
         }

@@ -1,5 +1,7 @@
 package asyncgui;
 
+import org.w3c.dom.css.Rect;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -9,6 +11,7 @@ public class Main extends JFrame implements ActionListener {
 
     JTextArea prime_area;
     JButton quit_button;
+    Rectangle rectangle_field;
 
     public Main() {
         getContentPane().setLayout(new BorderLayout());
@@ -20,10 +23,15 @@ public class Main extends JFrame implements ActionListener {
         prime_area.setAlignmentX(Component.CENTER_ALIGNMENT);
         prime_area.setLineWrap(true);
 
+        rectangle_field = new Rectangle(1000, 500);
+        rectangle_field.setPreferredSize(new Dimension(1000, 500));
+        rectangle_field.setLayout(new BorderLayout());
+
         JScrollPane scrollpane = new JScrollPane(prime_area);
         scrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 
+        getContentPane().add(rectangle_field, BorderLayout.NORTH);
         getContentPane().add(scrollpane);
         getContentPane().add(quit_button, BorderLayout.SOUTH);
     }
@@ -37,14 +45,14 @@ public class Main extends JFrame implements ActionListener {
     public static void main(String[] args) {
         Main gui = new Main();
         gui.setTitle("JavaGUI");
-        gui.setSize(1000,600);
+        gui.setSize(1000,800);
         gui.setResizable(false);
         gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gui.setVisible(true);
+        gui.rectangle_field.specificPaint();
 
         PrimeRunnable primerunnable = new PrimeRunnable(gui);
         Thread t = new Thread(primerunnable);
         t.start();
-
     }
 }
