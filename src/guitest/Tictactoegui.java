@@ -11,6 +11,9 @@ import java.net.Socket;
 
 public class Tictactoegui extends JFrame implements ActionListener{
 
+    private static final String SERVER_URL = "ftnk-ctek01.win.dtu.dk";
+    private static final int SERVER_PORT = 1060;
+
     static PrintWriter pw;
     public static JButton[] buttons = new JButton[9]; // Define variables to be used by other methods
 
@@ -18,6 +21,11 @@ public class Tictactoegui extends JFrame implements ActionListener{
         createButtonPage();
     }
 
+    /**
+     * Method for getting the next line received by the server
+     * @param bir BufferedReader from which to receive server messages
+     * @return String: next line received from server
+     */
     public static String getNextLine(BufferedReader bir) { // Method for getting next line from server
         String line = "";
         while (true) { // Try until readLine() returns a value
@@ -32,19 +40,26 @@ public class Tictactoegui extends JFrame implements ActionListener{
         return line; // Return the full line received from server
         }
 
+    /**
+     * Render all buttons with correct text specified by parameter.
+     * @param values String of format used by server (eg. "..x.x.o.o")
+     */
     public static void renderButtons(String values) { // Method for rendering the board with x, o or .
         for (int i = 0; i < 9; i++) {
             buttons[i].setText(Character.toString(values.charAt(i)));
         }
     }
 
-    public void createButtonPage() { // Creates all the buttons and fills them with empties / .
-        getContentPane().setLayout(new BorderLayout());
+    /**
+     * Creates the buttons in a grid layout and fill their text with dots, which specify empty fields
+     */
+    public void createButtonPage() {
+        getContentPane().setLayout(new BorderLayout()); // Set layout to BorderLayout
 
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < 9; i++) { // Initialise 9 buttons with text .
             JButton button = new JButton(".");
-            button.setFont(new Font("Serif",Font.BOLD,30));
-            buttons[i] = button;
+            button.setFont(new Font("Serif",Font.BOLD,30)); // Change font for readability
+            buttons[i] = button; // Add to array
             buttons[i].setAlignmentX(Component.CENTER_ALIGNMENT);
             buttons[i].addActionListener(this); // Centers all buttons and adds action listeners
         }
@@ -55,28 +70,34 @@ public class Tictactoegui extends JFrame implements ActionListener{
         for (int i = 0; i < 9; i++) {
             buttons_panel.add(buttons[i]); // Adds buttons to grid
         }
-
         getContentPane().add(buttons_panel, BorderLayout.CENTER);
     }
 
-    public void actionPerformed(ActionEvent e) { // Method for handling all button presses
+    /**
+     * Method for handling user interaction, i.e. a button is pressed
+     * @param e ActionEvent passed to method when button is pressed
+     */
+    public void actionPerformed(ActionEvent e) {
         int button_pressed = 0;
 
-        for (int i = 0; i < 9; i++) {
+        for (int i = 0; i < 9; i++) { // Loop though buttons to see which one is pressed
             if (e.getSource() == buttons[i]) {
-                button_pressed = i+1;
+                button_pressed = i+1; // Add one since server expects 1-indexed numbers
             }
         }
-        pw.print(Integer.toString(button_pressed) + "\r\n"); // Writes the number of the pressed button to the server
-        pw.flush();
+        pw.print(Integer.toString(button_pressed) + "\r\n");
+        pw.flush(); // Write the button press to server
     }
 
-    public static void showRepeat() { // Method for repeating the game
+    /**
+     * Method for showing the "Repeat Game" text box. Method is run when a game is completed
+     */
+    public static void showRepeat() {
         int output = JOptionPane.showConfirmDialog(null
         , "Want to run game again?"
         , "Repeat"
         , JOptionPane.YES_NO_OPTION
-        , JOptionPane.INFORMATION_MESSAGE);
+        , JOptionPane.INFORMATION_MESSAGE); // Show yes or no options with text and title
 
         if (output == JOptionPane.YES_OPTION) { // Renders the board with empties and restarts connection to server
             renderButtons(".........");
@@ -85,13 +106,16 @@ public class Tictactoegui extends JFrame implements ActionListener{
             // Empty, only used for error handling
         }
         else {
-            throw new RuntimeException("Wrong option returned from yes/no dialog"); // Something must be wrong...
+            throw new RuntimeException("Wrong option returned from yes/no dialog"); // Unknown option is given
         }
     }
 
+    /**
+     * Main method for running a game. Is run by main() after board is initialised
+     */
     public static void runGame() {
-        String server_URL = "ftnk-ctek01.win.dtu.dk"; // Define server address
-        int server_port = 1060;
+        String server_URL = SERVER_URL; // Define server address
+        int server_port = SERVER_PORT;
         Socket sock = null;
 
         try {
@@ -125,6 +149,10 @@ public class Tictactoegui extends JFrame implements ActionListener{
         }
     }
 
+    /**
+     * Static method main for running the game. Creates the game window and starts the game
+     * @param args Args supplied if run by command line. Not used
+     */
     public static void main(String[] args) {
         Tictactoegui gamegui = new Tictactoegui();
         gamegui.setTitle("JavaGUI");

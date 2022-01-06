@@ -52,6 +52,7 @@ public class Main extends JFrame implements ActionListener {
 
     /**
      * Static main method to be run.
+     * @param args Args if run by command line. Not used.
      */
     public static void main(String[] args) { // Static main method for running
         Main gui = new Main(); // Initialise main window
