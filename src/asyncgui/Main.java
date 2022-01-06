@@ -9,10 +9,15 @@ public class Main extends JFrame implements ActionListener {
 
     private static final int PRIME_SLEEP_TIME = 100; // Set amount of sleep time in ms for writing primes
     private static final int RECTANGLE_SLEEP_TIME = 100; // Set amount of sleep time in ms for drawing rectangles
+    private static final int WINDOW_WIDTH = 1000;
+    private static final int RECTANGLE_FIELD_HEIGHT = 500;
+    private static final int PRIME_TEXT_AREA_HEIGHT = 800; // Note: changes the amount of primes displayed
+    private static final int QUIT_BUTTON_HEIGHT = 50; // Change window dimensions
 
     JTextArea prime_area;
     JButton quit_button;
     RectanglePanel rectangle_field; // Frames and elements for the GUI
+    JScrollPane scrollpane;
 
     /**
      * Constructor for creating GUI-window. Takes no parameters.
@@ -21,17 +26,19 @@ public class Main extends JFrame implements ActionListener {
         getContentPane().setLayout(new BorderLayout()); // Set borderlayout for main frame
 
         quit_button = new JButton("Quit");
+        quit_button.setPreferredSize(new Dimension(WINDOW_WIDTH, QUIT_BUTTON_HEIGHT));
         quit_button.addActionListener(this); // Exit button
 
         prime_area = new JTextArea();
         prime_area.setAlignmentX(Component.CENTER_ALIGNMENT);
+        prime_area.setPreferredSize(new Dimension(WINDOW_WIDTH, PRIME_TEXT_AREA_HEIGHT));
         prime_area.setLineWrap(true); // Text area for writing primes
 
-        rectangle_field = new RectanglePanel(1000, 500);
-        rectangle_field.setPreferredSize(new Dimension(1000, 500));
+        rectangle_field = new RectanglePanel(WINDOW_WIDTH, RECTANGLE_FIELD_HEIGHT);
+        rectangle_field.setPreferredSize(new Dimension(WINDOW_WIDTH, RECTANGLE_FIELD_HEIGHT));
         rectangle_field.setLayout(new BorderLayout()); // Extension of JPanel for painting rectangles
 
-        JScrollPane scrollpane = new JScrollPane(prime_area);
+        scrollpane = new JScrollPane(prime_area);
         scrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS); // Add scroll bar to prime area
 
@@ -55,9 +62,10 @@ public class Main extends JFrame implements ActionListener {
      * @param args Args if run by command line. Not used.
      */
     public static void main(String[] args) { // Static main method for running
+        int total_window_height = RECTANGLE_FIELD_HEIGHT + PRIME_TEXT_AREA_HEIGHT + QUIT_BUTTON_HEIGHT;
         Main gui = new Main(); // Initialise main window
         gui.setTitle("JavaGUI");
-        gui.setSize(1000,800);
+        gui.setSize(WINDOW_WIDTH,total_window_height);
         gui.setResizable(false);
         gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gui.setVisible(true); // Set parameters for window and show

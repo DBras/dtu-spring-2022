@@ -1,5 +1,7 @@
 package asyncgui;
 
+import java.awt.*;
+
 public class PrimeRunnable implements Runnable {
     Main parent; // Field for parent GUI
     int sleep_time;
@@ -19,6 +21,7 @@ public class PrimeRunnable implements Runnable {
      */
     public void run() {
         parent.prime_area.append(2 + " "); // Start by writing 2 to parent.prime_area
+        parent.prime_area.setCaretPosition(parent.prime_area.getDocument().getLength()); // Caret follows appended text
         int number = 3;
         boolean is_prime; // Start at 3 and initialise is_prime boolean
         while(true) { // Run until interrupted
@@ -35,6 +38,7 @@ public class PrimeRunnable implements Runnable {
             }
             if (is_prime) { // If the number is prime, add it to the text_area
                 parent.prime_area.append(Integer.toString(number) + " ");
+                parent.prime_area.setCaretPosition(parent.prime_area.getDocument().getLength());
             }
             number+=2; // Check next odd number
         }
