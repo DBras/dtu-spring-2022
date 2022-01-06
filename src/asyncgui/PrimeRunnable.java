@@ -2,13 +2,15 @@ package asyncgui;
 
 public class PrimeRunnable implements Runnable {
     Main parent; // Field for parent GUI
+    int sleep_time;
 
     /**
      * Constructor for runnable. Run by the Main.main-method.
      * @param p Takes the main GUI as argument so it can interact.
      */
-    public PrimeRunnable(Main p) {
+    public PrimeRunnable(Main p, int sleep_time) {
         parent = p; // Sets the parent-field to the passed parameter
+        this.sleep_time = sleep_time;
     }
 
     /**
@@ -21,7 +23,7 @@ public class PrimeRunnable implements Runnable {
         boolean is_prime; // Start at 3 and initialise is_prime boolean
         while(true) { // Run until interrupted
             try {
-                Thread.sleep(100); // Start by sleeping
+                Thread.sleep(this.sleep_time); // Start by sleeping
             } catch (InterruptedException e) {}
 
             is_prime = true; // Assume number is prime

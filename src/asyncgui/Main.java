@@ -7,6 +7,9 @@ import java.awt.event.ActionListener;
 
 public class Main extends JFrame implements ActionListener {
 
+    private static final int PRIME_SLEEP_TIME = 100; // Set amount of sleep time in ms for writing primes
+    private static final int RECTANGLE_SLEEP_TIME = 100; // Set amount of sleep time in ms for drawing rectangles
+
     JTextArea prime_area;
     JButton quit_button;
     RectanglePanel rectangle_field; // Frames and elements for the GUI
@@ -58,11 +61,11 @@ public class Main extends JFrame implements ActionListener {
         gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gui.setVisible(true); // Set parameters for window and show
 
-        PrimeRunnable prime_runnable = new PrimeRunnable(gui);
+        PrimeRunnable prime_runnable = new PrimeRunnable(gui, PRIME_SLEEP_TIME);
         Thread t = new Thread(prime_runnable);
         t.start(); // Start thread for writing prime numbers to window
 
-        RectangleRunnable rectangle_runnable = new RectangleRunnable(gui);
+        RectangleRunnable rectangle_runnable = new RectangleRunnable(gui, RECTANGLE_SLEEP_TIME);
         Thread rectangle_thread = new Thread(rectangle_runnable);
         rectangle_thread.start(); // Start thread for painting triangles
     }
