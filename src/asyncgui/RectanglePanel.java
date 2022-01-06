@@ -5,7 +5,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Random;
 
-public class RectangleFrame extends JPanel {
+public class RectanglePanel extends JPanel {
     // Initialise fields to be used. Colors are stored in a list to be accessed randomly
     private BufferedImage img;
     private Random r = new Random();
@@ -19,7 +19,7 @@ public class RectangleFrame extends JPanel {
      * @param w Width of the frame
      * @param h Height of the frame
      */
-    public RectangleFrame(int w, int h) {
+    public RectanglePanel(int w, int h) {
         setBorder(BorderFactory.createLineBorder(Color.BLACK));
         this.w = w;
         this.h = h;

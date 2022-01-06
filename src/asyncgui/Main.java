@@ -9,7 +9,7 @@ public class Main extends JFrame implements ActionListener {
 
     JTextArea prime_area;
     JButton quit_button;
-    RectangleFrame rectangle_field; // Frames and elements for the GUI
+    RectanglePanel rectangle_field; // Frames and elements for the GUI
 
     /**
      * Constructor for creating GUI-window. Takes no parameters.
@@ -24,7 +24,7 @@ public class Main extends JFrame implements ActionListener {
         prime_area.setAlignmentX(Component.CENTER_ALIGNMENT);
         prime_area.setLineWrap(true); // Text area for writing primes
 
-        rectangle_field = new RectangleFrame(1000, 500);
+        rectangle_field = new RectanglePanel(1000, 500);
         rectangle_field.setPreferredSize(new Dimension(1000, 500));
         rectangle_field.setLayout(new BorderLayout()); // Extension of JPanel for painting rectangles
 
@@ -58,8 +58,8 @@ public class Main extends JFrame implements ActionListener {
         gui.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         gui.setVisible(true); // Set parameters for window and show
 
-        PrimeRunnable primerunnable = new PrimeRunnable(gui);
-        Thread t = new Thread(primerunnable);
+        PrimeRunnable prime_runnable = new PrimeRunnable(gui);
+        Thread t = new Thread(prime_runnable);
         t.start(); // Start thread for writing prime numbers to window
 
         RectangleRunnable rectangle_runnable = new RectangleRunnable(gui);
