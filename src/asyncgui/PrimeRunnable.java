@@ -31,7 +31,7 @@ public class PrimeRunnable implements Runnable {
             } catch (InterruptedException e) {}
 
             is_prime = true; // Assume number is prime
-            for (int i = 3; i <= number / 2; i+= 2) { // Try to divide by all odd numbers up to half of number
+            for (int i = 3; i <= Math.sqrt(number); i+= 2) { // Try to divide by all odd numbers up to sqrt of number
                 if (number%i == 0) {
                     is_prime = false; // Break the loop if the number is not prime
                     break;

@@ -12,6 +12,7 @@ public class Main extends JFrame implements ActionListener {
     private static final int WINDOW_WIDTH = 1000;
     private static final int RECTANGLE_FIELD_HEIGHT = 500;
     private static final int PRIME_TEXT_AREA_HEIGHT = 800; // Note: changes the amount of primes displayed
+    private static final int SCROLL_PANE_HEIGHT = 300;
     private static final int QUIT_BUTTON_HEIGHT = 50; // Change window dimensions
 
     JTextArea prime_area;
@@ -39,6 +40,7 @@ public class Main extends JFrame implements ActionListener {
         rectangle_field.setLayout(new BorderLayout()); // Extension of JPanel for painting rectangles
 
         scrollpane = new JScrollPane(prime_area);
+        scrollpane.setPreferredSize(new Dimension(WINDOW_WIDTH, 1000));
         scrollpane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         scrollpane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS); // Add scroll bar to prime area
 
@@ -62,7 +64,7 @@ public class Main extends JFrame implements ActionListener {
      * @param args Args if run by command line. Not used.
      */
     public static void main(String[] args) { // Static main method for running
-        int total_window_height = RECTANGLE_FIELD_HEIGHT + PRIME_TEXT_AREA_HEIGHT + QUIT_BUTTON_HEIGHT;
+        int total_window_height = RECTANGLE_FIELD_HEIGHT + SCROLL_PANE_HEIGHT + QUIT_BUTTON_HEIGHT;
         Main gui = new Main(); // Initialise main window
         gui.setTitle("JavaGUI");
         gui.setSize(WINDOW_WIDTH,total_window_height);
