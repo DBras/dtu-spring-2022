@@ -19,6 +19,7 @@ public class PrimeRunnable implements Runnable {
      * run-method from Runnable is run when the thread is started. Calculates prime numbers and writes them to
      * the parent.prime_area text area.
      */
+    @Override
     public void run() {
         parent.prime_area.append(2 + " "); // Start by writing 2 to parent.prime_area
         parent.prime_area.setCaretPosition(parent.prime_area.getDocument().getLength()); // Caret follows appended text

@@ -30,6 +30,7 @@ public class RectanglePanel extends JPanel {
      * Run when Panel is drawn. Simply draws the image
      * @param g Graphics passed when drawing the image
      */
+    @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g); // Necessary for drawing component
         g.drawImage(img, 0, 0, this); // Draws image

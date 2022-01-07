@@ -18,6 +18,7 @@ public class RectangleRunnable implements Runnable {
      * Run-method from Runnable is called when thread is started. Draws random rectangles on the Panel
      * until stopped
      */
+    @Override
     public void run() {
         while(true) { // Run until interrupted
             try {
