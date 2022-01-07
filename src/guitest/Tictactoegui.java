@@ -11,11 +11,11 @@ import java.net.Socket;
 
 public class Tictactoegui extends JFrame implements ActionListener{
 
-    private static final String SERVER_URL = "ftnk-ctek01.win.dtu.dk";
-    private static final int SERVER_PORT = 1060;
+    private final String SERVER_URL = "ftnk-ctek01.win.dtu.dk";
+    private final int SERVER_PORT = 1060;
 
-    static PrintWriter pw;
-    public static JButton[] buttons = new JButton[9]; // Define variables to be used by other methods
+    PrintWriter pw;
+    public  JButton[] buttons = new JButton[9]; // Define variables to be used by other methods
 
     public Tictactoegui() { // Renders the game board
         createButtonPage();
@@ -26,7 +26,7 @@ public class Tictactoegui extends JFrame implements ActionListener{
      * @param bir BufferedReader from which to receive server messages
      * @return String: next line received from server
      */
-    public static String getNextLine(BufferedReader bir) { // Method for getting next line from server
+    public String getNextLine(BufferedReader bir) { // Method for getting next line from server
         String line = "";
         while (true) { // Try until readLine() returns a value
             try {
@@ -44,7 +44,7 @@ public class Tictactoegui extends JFrame implements ActionListener{
      * Render all buttons with correct text specified by parameter.
      * @param values String of format used by server (eg. "..x.x.o.o")
      */
-    public static void renderButtons(String values) { // Method for rendering the board with x, o or .
+    public void renderButtons(String values) { // Method for rendering the board with x, o or .
         for (int i = 0; i < 9; i++) {
             buttons[i].setText(Character.toString(values.charAt(i)));
         }
@@ -85,14 +85,14 @@ public class Tictactoegui extends JFrame implements ActionListener{
                 button_pressed = i+1; // Add one since server expects 1-indexed numbers
             }
         }
-        pw.print(Integer.toString(button_pressed) + "\r\n");
+        pw.print(button_pressed + "\r\n");
         pw.flush(); // Write the button press to server
     }
 
     /**
      * Method for showing the "Repeat Game" text box. Method is run when a game is completed
      */
-    public static void showRepeat() {
+    public void showRepeat() {
         int output = JOptionPane.showConfirmDialog(null
         , "Want to run game again?"
         , "Repeat"
@@ -100,8 +100,8 @@ public class Tictactoegui extends JFrame implements ActionListener{
         , JOptionPane.INFORMATION_MESSAGE); // Show yes or no options with text and title
 
         if (output == JOptionPane.YES_OPTION) { // Renders the board with empties and restarts connection to server
-            renderButtons(".........");
-            runGame();
+            this.renderButtons(".........");
+            this.runGame();
         } else if (output == JOptionPane.NO_OPTION) {
             System.exit(0);
         } else if (output == JOptionPane.CANCEL_OPTION) {
@@ -115,7 +115,7 @@ public class Tictactoegui extends JFrame implements ActionListener{
     /**
      * Main method for running a game. Is run by main() after board is initialised
      */
-    public static void runGame() {
+    public void runGame() {
         String server_URL = SERVER_URL; // Define server address
         int server_port = SERVER_PORT;
         Socket sock = null;
@@ -130,9 +130,9 @@ public class Tictactoegui extends JFrame implements ActionListener{
 
             while(game_running) { // Run until game is over
                 while(!nextLine.equals("YOUR TURN")) { // Run until the user is prompted
-                    nextLine = getNextLine(bir); // Get line written by server
+                    nextLine = this.getNextLine(bir); // Get line written by server
                     if (nextLine.substring(0,8).equals("BOARD IS")) { // In this case, render the board
-                        renderButtons(nextLine.substring(9,18));
+                        this.renderButtons(nextLine.substring(9,18));
                     }
                     else if (nextLine.equals("ILLEGAL MOVE")) { // Show alert because of illegal move
                         JOptionPane.showMessageDialog(null, nextLine, "Alert", JOptionPane.WARNING_MESSAGE);
@@ -140,7 +140,7 @@ public class Tictactoegui extends JFrame implements ActionListener{
                     else if (nextLine.endsWith("WINS")) { // Game should end
                         game_running = false;
                         JOptionPane.showMessageDialog(null, nextLine); // Show who won
-                        showRepeat(); // Ask player to repeat game
+                        this.showRepeat(); // Ask player to repeat game
                         break;
                     }
                 }
@@ -164,6 +164,6 @@ public class Tictactoegui extends JFrame implements ActionListener{
         gamegui.setVisible(true); // Initialise the game board. Only does this once, as it is reused if
                                     // player chooses to replay game
 
-        runGame(); // Run the main game loop
+        gamegui.runGame(); // Run the main game loop
     }
 }
