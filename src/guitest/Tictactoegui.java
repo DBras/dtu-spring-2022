@@ -126,8 +126,8 @@ public class Tictactoegui extends JFrame implements ActionListener{
             String nextLine = "";
             boolean game_running = true; // Runs the following loop as long as the game is defined as running
 
-            while(game_running) {
-                while(!nextLine.equals("YOUR TURN")) {
+            while(game_running) { // Run until game is over
+                while(!nextLine.equals("YOUR TURN")) { // Run until the user is prompted
                     nextLine = getNextLine(bir); // Get line written by server
                     if (nextLine.substring(0,8).equals("BOARD IS")) { // In this case, render the board
                         renderButtons(nextLine.substring(9,18));
