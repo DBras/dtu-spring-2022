@@ -96,14 +96,16 @@ public class Tictactoegui extends JFrame implements ActionListener{
         int output = JOptionPane.showConfirmDialog(null
         , "Want to run game again?"
         , "Repeat"
-        , JOptionPane.YES_NO_OPTION
+        , JOptionPane.YES_NO_CANCEL_OPTION
         , JOptionPane.INFORMATION_MESSAGE); // Show yes or no options with text and title
 
         if (output == JOptionPane.YES_OPTION) { // Renders the board with empties and restarts connection to server
             renderButtons(".........");
             runGame();
         } else if (output == JOptionPane.NO_OPTION) {
-            // Empty, only used for error handling
+            System.exit(0);
+        } else if (output == JOptionPane.CANCEL_OPTION) {
+            // Empty, conserve window
         }
         else {
             throw new RuntimeException("Wrong option returned from yes/no dialog"); // Unknown option is given
