@@ -13,7 +13,7 @@ public class Main {
             while (server_active) {
                 Socket client_socket = server_sock.accept();
 
-                ClientRunnable new_client = new ClientRunnable();
+                ClientRunnable new_client = new ClientRunnable(client_socket);
                 Thread client_thread = new Thread(new_client);
                 client_thread.start();
             }
