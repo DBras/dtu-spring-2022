@@ -12,26 +12,19 @@ import java.util.TimeZone;
 
 public class ClientRunnable implements Runnable{
     private Socket client_socket;
+    private Deck player_hand;
 
     public ClientRunnable(Socket client_socket) {
         this.client_socket = client_socket;
+        this.player_hand = new Deck();
     }
 
     public void run() {
         writeToSocket("Hello!");
-        String requested_resouce = getRequest();
-        if (requested_resouce.equals("/LUK")) {
-            System.exit(0);
-        }
-        else if (requested_resouce.equals("/")) {
-            requested_resouce = "/index.html";
-        }
-        System.out.println(requested_resouce);
 
-        sendResource(requested_resouce);
     }
 
-    private void writeToSocket(String message) {
+    public void writeToSocket(String message) {
         try {
             BufferedOutputStream bos = new BufferedOutputStream(this.client_socket.getOutputStream());
             message += "\r\n";
@@ -40,6 +33,14 @@ public class ClientRunnable implements Runnable{
         } catch (IOException e) {
             //
         }
+    }
+
+    public void writeHandToSocket() {
+        writeToSocket(this.player_hand.toString());
+    }
+
+    public void giveCard(Card c) {
+        this.player_hand.addCard(c);
     }
 
     private String getRequest() {
