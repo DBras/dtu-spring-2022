@@ -18,9 +18,7 @@ public class ClientRunnable implements Runnable{
     }
 
     public void run() {
-        try {
-            this.client_socket.getOutputStream().write("Hello!".getBytes(StandardCharsets.UTF_8));
-        } catch (IOException e) {}
+        writeToSocket("Hello!");
         String requested_resouce = getRequest();
         if (requested_resouce.equals("/LUK")) {
             System.exit(0);
@@ -31,6 +29,17 @@ public class ClientRunnable implements Runnable{
         System.out.println(requested_resouce);
 
         sendResource(requested_resouce);
+    }
+
+    private void writeToSocket(String message) {
+        try {
+            BufferedOutputStream bos = new BufferedOutputStream(this.client_socket.getOutputStream());
+            message += "\r\n";
+            bos.write(message.getBytes(StandardCharsets.UTF_8));
+            bos.flush();
+        } catch (IOException e) {
+            //
+        }
     }
 
     private String getRequest() {

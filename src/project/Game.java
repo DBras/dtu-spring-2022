@@ -2,6 +2,7 @@ package project;
 
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class Game implements Runnable{
     private ArrayList<Socket> sockets;
@@ -10,6 +11,9 @@ public class Game implements Runnable{
     }
 
     public void run() {
+        Deck card_deck = new Deck();
+        card_deck.shuffle();
+
         Socket sock;
         for (int i = 0; i < this.sockets.size(); i++) {
             sock = this.sockets.get(i);

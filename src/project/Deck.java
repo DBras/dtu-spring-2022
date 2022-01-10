@@ -12,10 +12,10 @@ public class Deck {
 
     public Deck() {
         this.deck_of_cards = new ArrayList<Card>();
-        initRandomDeck();
+        initSortedDeck();
     }
 
-    private void initRandomDeck() {
+    private void initSortedDeck() {
         String[] suits = {"Diamonds", "Clubs", "Hearts", "Spades"};
         for (int i = 0; i < suits.length; i++) {
             for (int j = 0; j < 13; j++) {
