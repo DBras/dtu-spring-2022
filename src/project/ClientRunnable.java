@@ -13,14 +13,16 @@ import java.util.TimeZone;
 public class ClientRunnable implements Runnable{
     private Socket client_socket;
     private Deck player_hand;
+    private int number_of_players;
 
-    public ClientRunnable(Socket client_socket) {
+    public ClientRunnable(Socket client_socket, int number_of_players) {
         this.client_socket = client_socket;
         this.player_hand = new Deck();
+        this.number_of_players = number_of_players;
     }
 
     public void run() {
-        writeToSocket("Hello!");
+        writeToSocket(String.format("Hello! There are %d players competing", this.number_of_players));
 
     }
 

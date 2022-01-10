@@ -24,7 +24,7 @@ public class Game implements Runnable{
         Socket sock;
         for (int i = 0; i < this.sockets.size(); i++) {
             sock = this.sockets.get(i);
-            ClientRunnable new_client = new ClientRunnable(sock);
+            ClientRunnable new_client = new ClientRunnable(sock, this.sockets.size());
             Thread client_thread = new Thread(new_client);
             client_thread.start(); // Start new thread when client connects
             players.add(new_client);
