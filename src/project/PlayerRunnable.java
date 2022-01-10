@@ -20,6 +20,7 @@ public class PlayerRunnable implements Runnable{
 
     public void run() {
         writeToSocket(String.format("Hello! There are %d players competing", this.number_of_players));
+        writeToSocket(String.format("CASH BALANCE: %d", this.cash));
 
     }
 
@@ -48,32 +49,36 @@ public class PlayerRunnable implements Runnable{
 
     public void betMoney(int money) {
         this.cash = this.cash - money;
-        writeToSocket(String.format("%d was bet", money));
-        writeToSocket(String.format("New cash balance: %d", this.cash));
+        writeToSocket(String.format("BET %d", money));
+        writeToSocket(String.format("CASH BALANCE: %d", this.cash));
     }
 
     public void subtractMoney(int money) {
         this.cash = this.cash - money;
-        writeToSocket(String.format("New cash balance: %d", this.cash));
+        writeToSocket(String.format("CASH BALANCE: %d", this.cash));
     }
 
-    public int getBet() {
+    public String getOption() {
+        this.writeToSocket("YOUR TURN");
         Scanner user_input = null;
         String line = "";
-        boolean bet_received = false;
+        boolean option_received = false;
         try {
             user_input = new Scanner(this.client_socket.getInputStream());
         } catch (IOException e) {
             e.printStackTrace();
-            bet_received = true;
+            option_received = true;
         }
-        while (!bet_received) {
+        while (!option_received) {
             line = user_input.nextLine();
-            if (line.startsWith("RAISE")) {
-                bet_received = true;
-                return Integer.parseInt(line.split(" ")[1]);
+            String command = line.split(" ")[0];
+            System.out.println(line);
+            if (command.equals("RAISE") || command.equals("CALL") || command.equals("FOLD")) {
+                return line;
+            } else {
+                writeToSocket("INVALID OPTION");
             }
         }
-        return -1;
+        return null;
     }
 }
