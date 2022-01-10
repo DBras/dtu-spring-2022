@@ -8,6 +8,8 @@ public class Game implements Runnable{
     private ArrayList<PlayerRunnable> players;
     private Deck card_deck;
     private Deck middle_deck = new Deck();
+    private int pot_cash = 0;
+    private final int MINIMUMBET = 50;
 
     public Game(ArrayList<Socket> sockets) {
         this.sockets = sockets;
@@ -31,6 +33,10 @@ public class Game implements Runnable{
         }
         dealPlayerCards(2);
         dealMiddleCards(3);
+        players.get(0).betMoney(MINIMUMBET / 2);
+        players.get(1).betMoney(MINIMUMBET);
+        this.pot_cash += MINIMUMBET / 2 + MINIMUMBET;
+        System.out.println(this.pot_cash);
     }
 
     public void dealPlayerCards(int number) {

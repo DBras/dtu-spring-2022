@@ -5,14 +5,16 @@ import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
 public class PlayerRunnable implements Runnable{
-    private Socket client_socket;
-    private Deck player_hand;
-    private int number_of_players;
+    private final Socket client_socket;
+    private final Deck player_hand;
+    private final int number_of_players;
+    private int cash;
 
     public PlayerRunnable(Socket client_socket, int number_of_players) {
         this.client_socket = client_socket;
         this.player_hand = new Deck();
         this.number_of_players = number_of_players;
+        this.cash = 300;
     }
 
     public void run() {
@@ -41,5 +43,15 @@ public class PlayerRunnable implements Runnable{
 
     public void giveCard(Card c) {
         this.player_hand.addCard(c);
+    }
+
+    public void betMoney(int money) {
+        this.cash = this.cash - money;
+        writeToSocket(String.format("%d was bet", money));
+        writeToSocket(String.format("New cash balance: %d", this.cash));
+    }
+
+    public void giveMoney(int money) {
+        this.cash = this.cash + money;
     }
 }
