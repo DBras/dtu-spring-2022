@@ -4,12 +4,12 @@ import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 
-public class ClientRunnable implements Runnable{
+public class PlayerRunnable implements Runnable{
     private Socket client_socket;
     private Deck player_hand;
     private int number_of_players;
 
-    public ClientRunnable(Socket client_socket, int number_of_players) {
+    public PlayerRunnable(Socket client_socket, int number_of_players) {
         this.client_socket = client_socket;
         this.player_hand = new Deck();
         this.number_of_players = number_of_players;
@@ -31,8 +31,12 @@ public class ClientRunnable implements Runnable{
         }
     }
 
-    public void writeHandToSocket() {
-        writeToSocket(this.player_hand.toString());
+    public void writeCardsToSocket() { // Method overloading for easier use
+        writeCardsToSocket(this.player_hand);
+    }
+
+    public void writeCardsToSocket(Deck cards) {
+        writeToSocket(cards.toString());
     }
 
     public void giveCard(Card c) {

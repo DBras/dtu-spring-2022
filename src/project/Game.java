@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 public class Game implements Runnable{
     private ArrayList<Socket> sockets;
-    private ArrayList<ClientRunnable> players;
+    private ArrayList<PlayerRunnable> players;
     private Deck card_deck;
     private Deck middle_deck = new Deck();
 
@@ -23,7 +23,7 @@ public class Game implements Runnable{
         Socket sock;
         for (int i = 0; i < this.sockets.size(); i++) {
             sock = this.sockets.get(i);
-            ClientRunnable new_client = new ClientRunnable(sock, this.sockets.size());
+            PlayerRunnable new_client = new PlayerRunnable(sock, this.sockets.size());
             Thread client_thread = new Thread(new_client);
             client_thread.start(); // Start new thread when client connects
             players.add(new_client);
@@ -34,7 +34,7 @@ public class Game implements Runnable{
     }
 
     public void dealPlayerCards(int number) {
-        ClientRunnable player;
+        PlayerRunnable player;
         for (int i = 0; i < number; i++) {
             for (int j = 0; j < players.size(); j++) {
                 player = players.get(i);
@@ -43,7 +43,7 @@ public class Game implements Runnable{
         }
         for (int i = 0; i < this.players.size(); i++) {
             player = players.get(i);
-            player.writeHandToSocket();
+            player.writeCardsToSocket();
         }
         System.out.println(String.format("After deal deck size: %d", this.card_deck.getDeckSize()));
     }
