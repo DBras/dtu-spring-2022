@@ -18,6 +18,9 @@ public class ClientRunnable implements Runnable{
     }
 
     public void run() {
+        try {
+            this.client_socket.getOutputStream().write("Hello!".getBytes(StandardCharsets.UTF_8));
+        } catch (IOException e) {}
         String requested_resouce = getRequest();
         if (requested_resouce.equals("/LUK")) {
             System.exit(0);
@@ -97,7 +100,6 @@ public class ClientRunnable implements Runnable{
     private void sendResource(String requested_resource) {
         try {
             BufferedOutputStream bos = new BufferedOutputStream(this.client_socket.getOutputStream());
-            boolean file_exists = false;
             FileInputStream fin = null;
             File file = null;
             String date = "Date: " + getDate();
