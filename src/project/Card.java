@@ -31,6 +31,6 @@ public class Card implements Comparable<Card>{
     }
 
     public String toString() {
-        return String.format("%s%d", this.suit.charAt(0), this.card_value);
+        return String.format("%s%02d", this.suit.charAt(0), this.card_value);
     }
 }
