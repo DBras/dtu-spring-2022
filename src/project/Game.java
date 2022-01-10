@@ -35,10 +35,11 @@ public class Game implements Runnable{
         dealMiddleCards(3);
         this.players.get(0).betMoney(MINIMUMBET / 2);
         this.players.get(1).betMoney(MINIMUMBET);
+        this.players.get(3).subtractMoney(150);
         addToPot(MINIMUMBET / 2 + MINIMUMBET);
         int current_call = MINIMUMBET;
         for (int i = 2; i < this.players.size(); i++) {
-            String player_option = this.players.get(i).getOption();
+            String player_option = this.players.get(i).getOption(current_call);
             if (player_option.startsWith("RAISE")) {
                 int bet = Integer.parseInt(player_option.split(" ")[1]);
                 this.players.get(i).betMoney(bet);
