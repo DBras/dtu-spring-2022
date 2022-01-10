@@ -17,7 +17,6 @@ public class Main {
             while (server_active) { // Run as long as server_active is true
                 Socket client_socket = server_sock.accept(); // Accept client connection
                 current_sockets.add(client_socket);
-                System.out.println("Test");
 
                 if (current_sockets.size() >= MAX_PLAYERS) {
                     Game game = new Game(current_sockets);

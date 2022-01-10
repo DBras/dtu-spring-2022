@@ -72,7 +72,6 @@ public class PlayerRunnable implements Runnable{
         while (!option_received) {
             line = user_input.nextLine();
             String command = line.split(" ")[0];
-            System.out.println(line);
             if (command.equals("RAISE")) {
                 int bet = Integer.parseInt(line.split(" ")[1]);
                 if (bet > this.cash || bet < current_call) {

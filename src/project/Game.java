@@ -31,6 +31,7 @@ public class Game implements Runnable{
             this.players.add(new_client);
             System.out.println(sock + " was started");
         }
+
         dealPlayerCards(2);
         dealMiddleCards(3);
         this.players.get(0).betMoney(MINIMUMBET / 2);
@@ -61,7 +62,6 @@ public class Game implements Runnable{
         for (int i = 0; i < number; i++) {
             for (int j = 0; j < players.size(); j++) {
                 player = this.players.get(j);
-                System.out.println(player);
                 player.giveCard(this.card_deck.popTopCard());
             }
         }
