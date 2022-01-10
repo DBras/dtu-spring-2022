@@ -2,7 +2,6 @@ package project;
 
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Collections;
 
 public class Game implements Runnable{
     private ArrayList<Socket> sockets;
@@ -12,7 +11,7 @@ public class Game implements Runnable{
 
     public Game(ArrayList<Socket> sockets) {
         this.sockets = sockets;
-        this.players = new ArrayList<ClientRunnable>();
+        this.players = new ArrayList<>();
         this.card_deck = new Deck();
         this.card_deck.initSortedDeck();
         this.card_deck.shuffle();
@@ -31,12 +30,12 @@ public class Game implements Runnable{
             System.out.println(sock + " was started");
         }
         dealPlayerCards(2);
-        dealMiddleCards();
+        dealMiddleCards(3);
     }
 
-    public void dealPlayerCards(int number_of_cards) {
+    public void dealPlayerCards(int number) {
         ClientRunnable player;
-        for (int i = 0; i < number_of_cards; i++) {
+        for (int i = 0; i < number; i++) {
             for (int j = 0; j < players.size(); j++) {
                 player = players.get(i);
                 player.giveCard(this.card_deck.popTopCard());
@@ -49,8 +48,8 @@ public class Game implements Runnable{
         System.out.println(String.format("After deal deck size: %d", this.card_deck.getDeckSize()));
     }
 
-    public void dealMiddleCards() {
-        for (int i = 0; i < 3; i++) {
+    public void dealMiddleCards(int number) {
+        for (int i = 0; i < number; i++) {
             this.card_deck.popTopCard();
             this.middle_deck.addCard(this.card_deck.popTopCard());
         }
