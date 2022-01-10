@@ -28,27 +28,32 @@ public class Game implements Runnable{
             PlayerRunnable new_client = new PlayerRunnable(sock, this.sockets.size());
             Thread client_thread = new Thread(new_client);
             client_thread.start(); // Start new thread when client connects
-            players.add(new_client);
+            this.players.add(new_client);
             System.out.println(sock + " was started");
         }
         dealPlayerCards(2);
         dealMiddleCards(3);
-        players.get(0).betMoney(MINIMUMBET / 2);
-        players.get(1).betMoney(MINIMUMBET);
-        this.pot_cash += MINIMUMBET / 2 + MINIMUMBET;
+        this.players.get(0).betMoney(MINIMUMBET / 2);
+        this.players.get(1).betMoney(MINIMUMBET);
+        addToPot(MINIMUMBET / 2 + MINIMUMBET);
         System.out.println(this.pot_cash);
+        for (int i = 0; i < this.players.size(); i++) {
+            int bet = this.players.get(i).getBet();
+            this.players.get(i).subtractMoney(bet);
+            addToPot(bet);
+        }
     }
 
     public void dealPlayerCards(int number) {
         PlayerRunnable player;
         for (int i = 0; i < number; i++) {
             for (int j = 0; j < players.size(); j++) {
-                player = players.get(i);
+                player = this.players.get(i);
                 player.giveCard(this.card_deck.popTopCard());
             }
         }
         for (int i = 0; i < this.players.size(); i++) {
-            player = players.get(i);
+            player = this.players.get(i);
             player.writeCardsToSocket();
         }
         System.out.println(String.format("After deal deck size: %d", this.card_deck.getDeckSize()));
@@ -61,8 +66,15 @@ public class Game implements Runnable{
         }
         String middle_card_string = this.middle_deck.toString();
         for (int i = 0; i < this.players.size(); i++) {
-            players.get(i).writeToSocket(middle_card_string);
+            this.players.get(i).writeToSocket(middle_card_string);
         }
         System.out.println(String.format("After middle deal deck size: %d", this.card_deck.getDeckSize()));
+    }
+
+    public void addToPot(int money) {
+        this.pot_cash += money;
+        for (int i = 0; i < this.players.size(); i++) {
+            this.players.get(i).writeToSocket(String.format("Current pot: %d", this.pot_cash));
+        }
     }
 }

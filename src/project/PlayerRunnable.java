@@ -3,6 +3,7 @@ package project;
 import java.io.*;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.Scanner;
 
 public class PlayerRunnable implements Runnable{
     private final Socket client_socket;
@@ -51,7 +52,28 @@ public class PlayerRunnable implements Runnable{
         writeToSocket(String.format("New cash balance: %d", this.cash));
     }
 
-    public void giveMoney(int money) {
-        this.cash = this.cash + money;
+    public void subtractMoney(int money) {
+        this.cash = this.cash - money;
+        writeToSocket(String.format("New cash balance: %d", this.cash));
+    }
+
+    public int getBet() {
+        Scanner user_input = null;
+        String line = "";
+        boolean bet_received = false;
+        try {
+            user_input = new Scanner(this.client_socket.getInputStream());
+        } catch (IOException e) {
+            e.printStackTrace();
+            bet_received = true;
+        }
+        while (!bet_received) {
+            line = user_input.nextLine();
+            if (line.startsWith("RAISE")) {
+                bet_received = true;
+                return Integer.parseInt(line.split(" ")[1]);
+            }
+        }
+        return -1;
     }
 }
