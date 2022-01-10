@@ -12,16 +12,27 @@ public class Deck {
 
     public Deck() {
         this.deck_of_cards = new ArrayList<Card>();
-        initSortedDeck();
     }
 
-    private void initSortedDeck() {
+    public void initSortedDeck() {
         String[] suits = {"Diamonds", "Clubs", "Hearts", "Spades"};
         for (int i = 0; i < suits.length; i++) {
             for (int j = 0; j < 13; j++) {
                 deck_of_cards.add(new Card(suits[i], j+1));
             }
         }
+    }
+
+    public void addCard(Card c) {
+        this.deck_of_cards.add(c);
+    }
+
+    public Card popTopCard() {
+        return this.deck_of_cards.remove(0);
+    }
+
+    public int getDeckSize() {
+        return this.deck_of_cards.size();
     }
 
     public void shuffle() {
