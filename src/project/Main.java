@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 public class Main {
 	public static final int PORT_NUMBER = 8080; // Variable for port number
+    public static final int MAX_PLAYERS = 4;
     public static void main(String[] args) { // Run on start
         ServerSocket server_sock;
         boolean server_active = true;
@@ -18,7 +19,7 @@ public class Main {
                 current_sockets.add(client_socket);
                 System.out.println("Test");
 
-                if (current_sockets.size() >= 2) {
+                if (current_sockets.size() >= MAX_PLAYERS) {
                     Game game = new Game(current_sockets);
                     Thread game_thread = new Thread(game);
                     game_thread.start();

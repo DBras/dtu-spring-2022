@@ -36,11 +36,22 @@ public class Game implements Runnable{
         this.players.get(0).betMoney(MINIMUMBET / 2);
         this.players.get(1).betMoney(MINIMUMBET);
         addToPot(MINIMUMBET / 2 + MINIMUMBET);
-        System.out.println(this.pot_cash);
-        for (int i = 0; i < this.players.size(); i++) {
-            int bet = this.players.get(i).getBet();
-            this.players.get(i).subtractMoney(bet);
-            addToPot(bet);
+        int current_call = MINIMUMBET;
+        for (int i = 2; i < this.players.size(); i++) {
+            String player_option = this.players.get(i).getOption();
+            if (player_option.startsWith("RAISE")) {
+                int bet = Integer.parseInt(player_option.split(" ")[1]);
+                this.players.get(i).betMoney(bet);
+                addToPot(bet);
+                current_call = bet;
+            }
+            else if (player_option.startsWith("CALL")) {
+                this.players.get(i).betMoney(current_call);
+                addToPot(current_call);
+            }
+            else if (player_option.startsWith("FOLD")) {
+                //
+            }
         }
     }
 
@@ -48,7 +59,8 @@ public class Game implements Runnable{
         PlayerRunnable player;
         for (int i = 0; i < number; i++) {
             for (int j = 0; j < players.size(); j++) {
-                player = this.players.get(i);
+                player = this.players.get(j);
+                System.out.println(player);
                 player.giveCard(this.card_deck.popTopCard());
             }
         }
@@ -74,7 +86,7 @@ public class Game implements Runnable{
     public void addToPot(int money) {
         this.pot_cash += money;
         for (int i = 0; i < this.players.size(); i++) {
-            this.players.get(i).writeToSocket(String.format("Current pot: %d", this.pot_cash));
+            this.players.get(i).writeToSocket(String.format("POT: %d", this.pot_cash));
         }
     }
 }
