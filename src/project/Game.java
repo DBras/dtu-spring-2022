@@ -30,11 +30,11 @@ public class Game implements Runnable{
             players.add(new_client);
             System.out.println(sock + " was started");
         }
-        dealCards(2);
+        dealPlayerCards(2);
         dealMiddleCards();
     }
 
-    public void dealCards(int number_of_cards) {
+    public void dealPlayerCards(int number_of_cards) {
         ClientRunnable player;
         for (int i = 0; i < number_of_cards; i++) {
             for (int j = 0; j < players.size(); j++) {
