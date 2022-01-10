@@ -73,7 +73,14 @@ public class PlayerRunnable implements Runnable{
             line = user_input.nextLine();
             String command = line.split(" ")[0];
             System.out.println(line);
-            if (command.equals("RAISE") || command.equals("CALL") || command.equals("FOLD")) {
+            if (command.equals("RAISE")) {
+                if (Integer.parseInt(line.split(" ")[1]) > this.cash) {
+                    writeToSocket("INVALID BET");
+                } else {
+                    return line;
+                }
+            }
+            else if (command.equals("CALL") || command.equals("FOLD")) {
                 return line;
             } else {
                 writeToSocket("INVALID OPTION");
