@@ -48,28 +48,30 @@ public class PlayerRunnable implements Runnable{
     }
 
     public void betMoney(int money) {
-        this.cash = this.cash - money;
+        this.subtractMoney(money);
         writeToSocket(String.format("BET %d", money));
         writeToSocket(String.format("CASH BALANCE: %d", this.cash));
     }
 
     public void subtractMoney(int money) {
-        this.cash = this.cash - money;
-        writeToSocket(String.format("CASH BALANCE: %d", this.cash));
+        if (this.cash < money) {
+            throw new RuntimeException("Player does not have enough cash");
+        } else {
+            this.cash = this.cash - money;
+            writeToSocket(String.format("CASH BALANCE: %d", this.cash));
+        }
     }
 
     public String getOption(int current_call) {
         this.writeToSocket("YOUR TURN");
         Scanner user_input = null;
         String line = "";
-        boolean option_received = false;
         try {
             user_input = new Scanner(this.client_socket.getInputStream());
         } catch (IOException e) {
             e.printStackTrace();
-            option_received = true;
         }
-        while (!option_received) {
+        while (true) {
             line = user_input.nextLine();
             String command = line.split(" ")[0];
             if (command.equals("RAISE")) {
@@ -94,6 +96,5 @@ public class PlayerRunnable implements Runnable{
                 writeToSocket("INVALID OPTION");
             }
         }
-        return null;
     }
 }

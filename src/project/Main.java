@@ -7,7 +7,7 @@ import java.util.ArrayList;
 
 public class Main {
 	public static final int PORT_NUMBER = 8080; // Variable for port number
-    public static final int MAX_PLAYERS = 2;
+    public static final int MAX_PLAYERS = 4;
     public static void main(String[] args) { // Run on start
         ServerSocket server_sock;
         boolean server_active = true;
