@@ -35,12 +35,12 @@ public class PlayerRunnable implements Runnable{
         }
     }
 
-    public void writeCardsToSocket() { // Method overloading for easier use
-        writeCardsToSocket(this.player_hand);
+    public void writeHandToSocket() {
+        writeCardsToSocket(this.player_hand, "HAND: ");
     }
 
-    public void writeCardsToSocket(Deck cards) {
-        writeToSocket(cards.toString());
+    public void writeCardsToSocket(Deck cards, String message) {
+        writeToSocket(message + cards.toString());
     }
 
     public void giveCard(Card c) {
