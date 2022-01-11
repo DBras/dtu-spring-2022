@@ -104,6 +104,9 @@ public class PlayerRunnable implements Runnable{
             }
             else if (command.equals("FOLD")) {
                 return line;
+            }
+            else if (command.equals("CHECK")) {
+                return line;
             } else {
                 writeToSocket("INVALID OPTION");
             }

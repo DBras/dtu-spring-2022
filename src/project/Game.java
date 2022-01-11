@@ -11,6 +11,7 @@ public class Game implements Runnable{
     private Deck middle_deck = new Deck();
     private int pot_cash = 0;
     private int current_call = 0;
+    private ArrayList<PlayerRunnable> current_round_players;
     private final int MINIMUMBET = 50;
 
     public Game(ArrayList<Socket> sockets) {
@@ -35,37 +36,35 @@ public class Game implements Runnable{
             this.card_deck = new Deck();
             this.card_deck.initSortedDeck();
             this.card_deck.shuffle();
-
-            ArrayList<PlayerRunnable> current_round_players = getAlivePlayers();
-            current_round_players.get(0).betMoney(MINIMUMBET / 2);
-            current_round_players.get(1).betMoney(MINIMUMBET);
-            addToPot(MINIMUMBET / 2 + MINIMUMBET);
-            this.current_call = MINIMUMBET;
+            current_round_players = getAlivePlayers();
 
             broadcastMessage("NEW GAME STARTED");
             resetBoard();
             dealPlayerCards(2);
-            dealMiddleCards(3);
+            current_round_players.get(0).betMoney(MINIMUMBET / 2);
+            current_round_players.get(1).betMoney(MINIMUMBET);
+            addToPot(MINIMUMBET / 2 + MINIMUMBET);
+            this.current_call = MINIMUMBET;
             runRound(current_round_players, 2);
+            runPlayer(current_round_players.get(0), 0);
+            runPlayer(current_round_players.get(1), 1);
+            dealMiddleCards(3);
             if (current_round_players.size() > 1) {
                 dealMiddleCards(1);
                 runRound(current_round_players, 0);
             } else {
-                current_round_players.get(0).addMoney(this.pot_cash);
-                this.pot_cash = 0;
+                playerWins();
             }
             if (current_round_players.size() > 1) {
                 dealMiddleCards(1);
                 runRound(current_round_players, 0);
             } else {
-                current_round_players.get(0).addMoney(this.pot_cash);
-                this.pot_cash = 0;
+                playerWins();
             }
             if (current_round_players.size() > 1) {
                 broadcastMessage("TALLYING CARDS");
             } else {
-                current_round_players.get(0).addMoney(this.pot_cash);
-                this.pot_cash = 0;
+                playerWins();
             }
         }
     }
@@ -107,27 +106,43 @@ public class Game implements Runnable{
         this.middle_deck = new Deck();
     }
 
+    public void playerWins() {
+        current_round_players.get(0).addMoney(this.pot_cash);
+        this.pot_cash = 0;
+    }
+
     public void addToPot(int money) {
         this.pot_cash += money;
         broadcastMessage(String.format("POT: %d", this.pot_cash));
     }
 
+    public int runPlayer(PlayerRunnable player, int player_index) {
+        String player_option = player.getOption(this.current_call);
+        if (player_option.startsWith("RASIE")) {
+            int bet = Integer.parseInt(player_option.split(" ")[1]);
+            player.betMoney(bet);
+            addToPot(bet);
+            this.current_call = bet;
+            return player_index;
+        } else if (player_option.startsWith("CALL")) {
+            player.betMoney(this.current_call);
+            addToPot(this.current_call);
+            return player_index;
+        } else if (player_option.startsWith("FOLD")) {
+            this.current_round_players.remove(player_index);
+            return player_index - 1;
+        } else if (player_option.startsWith("CHECK")) {
+            this.current_round_players.add(this.current_round_players.get(player_index));
+            return player_index - 1;
+        } else {
+            return player_index;
+        }
+    }
+
     public void runRound(ArrayList<PlayerRunnable> current_round_players, int from_index) {
         for (int i = from_index; i < current_round_players.size(); i++) {
             if (current_round_players.size() > 1) {
-                String player_option = current_round_players.get(i).getOption(this.current_call);
-                if (player_option.startsWith("RAISE")) {
-                    int bet = Integer.parseInt(player_option.split(" ")[1]);
-                    current_round_players.get(i).betMoney(bet);
-                    addToPot(bet);
-                    this.current_call = bet;
-                } else if (player_option.startsWith("CALL")) {
-                    current_round_players.get(i).betMoney(this.current_call);
-                    addToPot(this.current_call);
-                } else if (player_option.startsWith("FOLD")) {
-                    current_round_players.remove(i);
-                    i--;
-                }
+                i = runPlayer(current_round_players.get(i), i);
             }
         }
     }
