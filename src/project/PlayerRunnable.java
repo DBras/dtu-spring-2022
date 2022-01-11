@@ -10,12 +10,15 @@ public class PlayerRunnable implements Runnable{
     private Deck player_hand;
     private final int number_of_players;
     private int cash;
+    private boolean player_active;
+    public int ID;
 
-    public PlayerRunnable(Socket client_socket, int number_of_players) {
+    public PlayerRunnable(Socket client_socket, int number_of_players, int ID) {
         this.client_socket = client_socket;
         this.player_hand = new Deck();
         this.number_of_players = number_of_players;
         this.cash = 300;
+        this.ID = ID;
     }
 
     public void run() {
@@ -74,7 +77,15 @@ public class PlayerRunnable implements Runnable{
         this.player_hand = new Deck();
     }
 
-    public String getOption(int current_call) {
+    public boolean getActiveStatus() {
+        return this.player_active;
+    }
+
+    public void setActiveStatus(boolean status) {
+        this.player_active = status;
+    }
+
+    public String getOption(int current_call, boolean can_call) {
         this.writeToSocket("YOUR TURN");
         Scanner user_input = null;
         String line = "";
@@ -105,7 +116,7 @@ public class PlayerRunnable implements Runnable{
             else if (command.equals("FOLD")) {
                 return line;
             }
-            else if (command.equals("CHECK")) {
+            else if (command.equals("CHECK") && can_call) {
                 return line;
             } else {
                 writeToSocket("INVALID OPTION");
