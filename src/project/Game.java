@@ -39,9 +39,9 @@ public class Game implements Runnable{
             this.card_deck.initSortedDeck();
             this.card_deck.shuffle();
             current_round_players = getAlivePlayers();
-
-            broadcastMessage("NEW GAME STARTED");
             resetBoard();
+            broadcastMessage("NEW GAME STARTED");
+
             dealPlayerCards(2);
             current_round_players.get(0).betMoney(MINIMUMBET / 2);
             current_round_players.get(1).betMoney(MINIMUMBET);
