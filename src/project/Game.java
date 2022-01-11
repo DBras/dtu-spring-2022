@@ -56,6 +56,7 @@ public class Game implements Runnable{
             this.can_check = true;
             dealMiddleCards(3);
             runRound(0);
+            this.can_check = true;
 
 
 //            dealMiddleCards(3);
@@ -137,19 +138,22 @@ public class Game implements Runnable{
 
     public int runPlayer(PlayerRunnable player, int player_index) {
         String player_option = player.getOption(this.current_call, this.can_check);
-        if (player_option.startsWith("RASIE")) {
+        if (player_option.startsWith("RAISE")) {
             int bet = Integer.parseInt(player_option.split(" ")[1]);
             player.betMoney(bet);
             addToPot(bet);
             this.current_call = bet;
+            this.can_check = false;
             return player_index;
         } else if (player_option.startsWith("CALL")) {
             player.betMoney(this.current_call);
             addToPot(this.current_call);
+            this.can_check = false;
             return player_index;
         } else if (player_option.startsWith("FOLD")) {
             this.current_round_players.remove(player_index);
             player.setActiveStatus(false);
+            this.can_check = false;
             return player_index - 1;
         } else if (player_option.startsWith("CHECK")) {
             this.current_round_players.add(this.current_round_players.remove(player_index));
