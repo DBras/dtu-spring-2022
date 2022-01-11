@@ -48,9 +48,8 @@ public class PlayerRunnable implements Runnable{
     }
 
     public void betMoney(int money) {
-        this.subtractMoney(money);
         writeToSocket(String.format("BET %d", money));
-        writeToSocket(String.format("CASH BALANCE: %d", this.cash));
+        this.subtractMoney(money);
     }
 
     public void subtractMoney(int money) {
@@ -60,6 +59,11 @@ public class PlayerRunnable implements Runnable{
             this.cash = this.cash - money;
             writeToSocket(String.format("CASH BALANCE: %d", this.cash));
         }
+    }
+
+    public void addMoney(int money) {
+        this.cash += money;
+        writeToSocket(String.format("CASH BALANCE: %d", this.cash));
     }
 
     public String getOption(int current_call) {

@@ -34,7 +34,6 @@ public class Game implements Runnable{
             System.out.println(sock + " was started");
         }
 
-        //this.players.get(3).subtractMoney(150);
         ArrayList<PlayerRunnable> current_round_players = new ArrayList<>(this.players);
         current_round_players.get(0).betMoney(MINIMUMBET / 2);
         current_round_players.get(1).betMoney(MINIMUMBET);
@@ -44,16 +43,38 @@ public class Game implements Runnable{
         dealPlayerCards(2);
         dealMiddleCards(3);
         runRound(current_round_players, 2);
-        dealMiddleCards(1);
-        runRound(current_round_players, 0);
-        dealMiddleCards(1);
-        runRound(current_round_players, 0);
+        if (current_round_players.size() > 1) {
+            dealMiddleCards(1);
+            runRound(current_round_players, 0);
+        } else {
+            current_round_players.get(0).addMoney(this.pot_cash);
+            this.pot_cash = 0;
+        }
+        if (current_round_players.size() > 1) {
+            dealMiddleCards(1);
+            runRound(current_round_players, 0);
+        } else {
+            current_round_players.get(0).addMoney(this.pot_cash);
+            this.pot_cash = 0;
+        }
+        if (current_round_players.size() > 1) {
+            broadcastMessage("TALLYING CARDS");
+        } else {
+            current_round_players.get(0).addMoney(this.pot_cash);
+            this.pot_cash = 0;
+        }
+    }
+
+    public void broadcastMessage(String message) {
+        for (int i = 0; i < players.size(); i++) {
+            players.get(i).writeToSocket(message);
+        }
     }
 
     public void dealPlayerCards(int number) {
         for (int i = 0; i < number; i++) {
             for (int j = 0; j < players.size(); j++) {
-                this.players.get(i).giveCard(this.card_deck.popTopCard());
+                this.players.get(j).giveCard(this.card_deck.popTopCard());
             }
         }
         for (int i = 0; i < this.players.size(); i++) {
@@ -75,9 +96,7 @@ public class Game implements Runnable{
 
     public void addToPot(int money) {
         this.pot_cash += money;
-        for (int i = 0; i < this.players.size(); i++) {
-            this.players.get(i).writeToSocket(String.format("POT: %d", this.pot_cash));
-        }
+        broadcastMessage(String.format("POT: %d", this.pot_cash));
     }
 
     public void runRound(ArrayList<PlayerRunnable> current_round_players, int from_index) {
