@@ -34,7 +34,7 @@ public class Game implements Runnable{
             System.out.println(sock + " was started");
         }
 
-        this.players.get(3).subtractMoney(150);
+        //this.players.get(3).subtractMoney(150);
         ArrayList<PlayerRunnable> current_round_players = new ArrayList<>(this.players);
         current_round_players.get(0).betMoney(MINIMUMBET / 2);
         current_round_players.get(1).betMoney(MINIMUMBET);
@@ -51,16 +51,13 @@ public class Game implements Runnable{
     }
 
     public void dealPlayerCards(int number) {
-        PlayerRunnable player;
         for (int i = 0; i < number; i++) {
             for (int j = 0; j < players.size(); j++) {
-                player = this.players.get(j);
-                player.giveCard(this.card_deck.popTopCard());
+                this.players.get(i).giveCard(this.card_deck.popTopCard());
             }
         }
         for (int i = 0; i < this.players.size(); i++) {
-            player = this.players.get(i);
-            player.writeHandToSocket();
+            this.players.get(i).writeHandToSocket();
         }
         System.out.println(String.format("After deal deck size: %d", this.card_deck.getDeckSize()));
     }
@@ -85,20 +82,20 @@ public class Game implements Runnable{
 
     public void runRound(ArrayList<PlayerRunnable> current_round_players, int from_index) {
         for (int i = from_index; i < current_round_players.size(); i++) {
-            String player_option = current_round_players.get(i).getOption(this.current_call);
-            if (player_option.startsWith("RAISE")) {
-                int bet = Integer.parseInt(player_option.split(" ")[1]);
-                current_round_players.get(i).betMoney(bet);
-                addToPot(bet);
-                this.current_call = bet;
-            }
-            else if (player_option.startsWith("CALL")) {
-                current_round_players.get(i).betMoney(this.current_call);
-                addToPot(this.current_call);
-            }
-            else if (player_option.startsWith("FOLD")) {
-                current_round_players.remove(i);
-                i--;
+            if (current_round_players.size() > 1) {
+                String player_option = current_round_players.get(i).getOption(this.current_call);
+                if (player_option.startsWith("RAISE")) {
+                    int bet = Integer.parseInt(player_option.split(" ")[1]);
+                    current_round_players.get(i).betMoney(bet);
+                    addToPot(bet);
+                    this.current_call = bet;
+                } else if (player_option.startsWith("CALL")) {
+                    current_round_players.get(i).betMoney(this.current_call);
+                    addToPot(this.current_call);
+                } else if (player_option.startsWith("FOLD")) {
+                    current_round_players.remove(i);
+                    i--;
+                }
             }
         }
     }
