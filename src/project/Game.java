@@ -2,6 +2,7 @@ package project;
 
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
 
 public class Game implements Runnable{
     private ArrayList<Socket> sockets;
@@ -32,29 +33,19 @@ public class Game implements Runnable{
             System.out.println(sock + " was started");
         }
 
+        this.players.get(3).subtractMoney(150);
+        ArrayList<PlayerRunnable> current_round_players = new ArrayList<>(this.players);
+        current_round_players.get(0).betMoney(MINIMUMBET / 2);
+        current_round_players.get(1).betMoney(MINIMUMBET);
+        addToPot(MINIMUMBET / 2 + MINIMUMBET);
+
         dealPlayerCards(2);
         dealMiddleCards(3);
-        this.players.get(0).betMoney(MINIMUMBET / 2);
-        this.players.get(1).betMoney(MINIMUMBET);
-        this.players.get(3).subtractMoney(150);
-        addToPot(MINIMUMBET / 2 + MINIMUMBET);
-        int current_call = MINIMUMBET;
-        for (int i = 2; i < this.players.size(); i++) {
-            String player_option = this.players.get(i).getOption(current_call);
-            if (player_option.startsWith("RAISE")) {
-                int bet = Integer.parseInt(player_option.split(" ")[1]);
-                this.players.get(i).betMoney(bet);
-                addToPot(bet);
-                current_call = bet;
-            }
-            else if (player_option.startsWith("CALL")) {
-                this.players.get(i).betMoney(current_call);
-                addToPot(current_call);
-            }
-            else if (player_option.startsWith("FOLD")) {
-                //
-            }
-        }
+        runRound(current_round_players, 2);
+        dealMiddleCards(1);
+        runRound(current_round_players, 0);
+        dealMiddleCards(1);
+        runRound(current_round_players, 0);
     }
 
     public void dealPlayerCards(int number) {
@@ -88,6 +79,29 @@ public class Game implements Runnable{
         this.pot_cash += money;
         for (int i = 0; i < this.players.size(); i++) {
             this.players.get(i).writeToSocket(String.format("POT: %d", this.pot_cash));
+        }
+    }
+
+    public void runRound(ArrayList<PlayerRunnable> current_round_players, int from_index) {
+        int current_call = MINIMUMBET;
+        for (int i = from_index; i < current_round_players.size(); i++) {
+            System.out.println(i);
+            System.out.println(this.players.size());
+            String player_option = current_round_players.get(i).getOption(current_call);
+            if (player_option.startsWith("RAISE")) {
+                int bet = Integer.parseInt(player_option.split(" ")[1]);
+                current_round_players.get(i).betMoney(bet);
+                addToPot(bet);
+                current_call = bet;
+            }
+            else if (player_option.startsWith("CALL")) {
+                current_round_players.get(i).betMoney(current_call);
+                addToPot(current_call);
+            }
+            else if (player_option.startsWith("FOLD")) {
+                current_round_players.remove(i);
+                i--;
+            }
         }
     }
 }
