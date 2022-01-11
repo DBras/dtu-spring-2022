@@ -16,9 +16,6 @@ public class Game implements Runnable{
     public Game(ArrayList<Socket> sockets) {
         this.sockets = sockets;
         this.players = new ArrayList<>();
-        this.card_deck = new Deck();
-        this.card_deck.initSortedDeck();
-        this.card_deck.shuffle();
     }
 
     public void run() {
@@ -34,34 +31,42 @@ public class Game implements Runnable{
             System.out.println(sock + " was started");
         }
 
-        ArrayList<PlayerRunnable> current_round_players = new ArrayList<>(this.players);
-        current_round_players.get(0).betMoney(MINIMUMBET / 2);
-        current_round_players.get(1).betMoney(MINIMUMBET);
-        addToPot(MINIMUMBET / 2 + MINIMUMBET);
-        this.current_call = MINIMUMBET;
+        while (getAlivePlayers().size() > 1) {
+            this.card_deck = new Deck();
+            this.card_deck.initSortedDeck();
+            this.card_deck.shuffle();
 
-        dealPlayerCards(2);
-        dealMiddleCards(3);
-        runRound(current_round_players, 2);
-        if (current_round_players.size() > 1) {
-            dealMiddleCards(1);
-            runRound(current_round_players, 0);
-        } else {
-            current_round_players.get(0).addMoney(this.pot_cash);
-            this.pot_cash = 0;
-        }
-        if (current_round_players.size() > 1) {
-            dealMiddleCards(1);
-            runRound(current_round_players, 0);
-        } else {
-            current_round_players.get(0).addMoney(this.pot_cash);
-            this.pot_cash = 0;
-        }
-        if (current_round_players.size() > 1) {
-            broadcastMessage("TALLYING CARDS");
-        } else {
-            current_round_players.get(0).addMoney(this.pot_cash);
-            this.pot_cash = 0;
+            ArrayList<PlayerRunnable> current_round_players = getAlivePlayers();
+            current_round_players.get(0).betMoney(MINIMUMBET / 2);
+            current_round_players.get(1).betMoney(MINIMUMBET);
+            addToPot(MINIMUMBET / 2 + MINIMUMBET);
+            this.current_call = MINIMUMBET;
+
+            broadcastMessage("NEW GAME STARTED");
+            resetBoard();
+            dealPlayerCards(2);
+            dealMiddleCards(3);
+            runRound(current_round_players, 2);
+            if (current_round_players.size() > 1) {
+                dealMiddleCards(1);
+                runRound(current_round_players, 0);
+            } else {
+                current_round_players.get(0).addMoney(this.pot_cash);
+                this.pot_cash = 0;
+            }
+            if (current_round_players.size() > 1) {
+                dealMiddleCards(1);
+                runRound(current_round_players, 0);
+            } else {
+                current_round_players.get(0).addMoney(this.pot_cash);
+                this.pot_cash = 0;
+            }
+            if (current_round_players.size() > 1) {
+                broadcastMessage("TALLYING CARDS");
+            } else {
+                current_round_players.get(0).addMoney(this.pot_cash);
+                this.pot_cash = 0;
+            }
         }
     }
 
@@ -94,6 +99,14 @@ public class Game implements Runnable{
         System.out.println(String.format("After middle deal deck size: %d", this.card_deck.getDeckSize()));
     }
 
+    public void resetBoard() {
+        ArrayList<PlayerRunnable> alive_players = getAlivePlayers();
+        for (int i = 0; i < alive_players.size(); i++) {
+            alive_players.get(i).resetHand();
+        }
+        this.middle_deck = new Deck();
+    }
+
     public void addToPot(int money) {
         this.pot_cash += money;
         broadcastMessage(String.format("POT: %d", this.pot_cash));
@@ -117,5 +130,15 @@ public class Game implements Runnable{
                 }
             }
         }
+    }
+
+    public ArrayList<PlayerRunnable> getAlivePlayers() {
+        ArrayList<PlayerRunnable> alive_players = new ArrayList<>();
+        for (int i = 0; i < this.players.size(); i++) {
+            if (this.players.get(i).getMoney() > 0) {
+                alive_players.add(players.get(i));
+            }
+        }
+        return alive_players;
     }
 }

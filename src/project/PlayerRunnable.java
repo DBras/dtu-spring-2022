@@ -7,7 +7,7 @@ import java.util.Scanner;
 
 public class PlayerRunnable implements Runnable{
     private final Socket client_socket;
-    private final Deck player_hand;
+    private Deck player_hand;
     private final int number_of_players;
     private int cash;
 
@@ -64,6 +64,14 @@ public class PlayerRunnable implements Runnable{
     public void addMoney(int money) {
         this.cash += money;
         writeToSocket(String.format("CASH BALANCE: %d", this.cash));
+    }
+
+    public int getMoney() {
+        return this.cash;
+    }
+
+    public void resetHand() {
+        this.player_hand = new Deck();
     }
 
     public String getOption(int current_call) {
