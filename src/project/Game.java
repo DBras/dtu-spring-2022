@@ -58,6 +58,27 @@ public class Game implements Runnable{
             runRound(0);
             this.can_check = true;
 
+            if (current_round_players.size() > 1) {
+                current_round_players = getActivePlayers();
+                dealMiddleCards(1);
+                runRound(0);
+                this.can_check = true;
+            } else {
+                playerWins();
+            }
+
+            if (current_round_players.size() > 1) {
+                current_round_players = getActivePlayers();
+                dealMiddleCards(1);
+                runRound(0);
+                this.can_check = true;
+            } else {
+                playerWins();
+            }
+
+            if (current_round_players.size() > 1) {
+                findWinner();
+            }
 
 //            dealMiddleCards(3);
 //            this.can_call = true;
@@ -134,6 +155,10 @@ public class Game implements Runnable{
         for (int i = 0; i < alive_players.size(); i++) {
             alive_players.get(i).setActiveStatus(true);
         }
+    }
+
+    public void findWinner() {
+        broadcastMessage("FINDING WINNER");
     }
 
     public int runPlayer(PlayerRunnable player, int player_index) {
