@@ -13,11 +13,11 @@ public class PlayerRunnable implements Runnable{
     private boolean player_active;
     public int ID;
 
-    public PlayerRunnable(Socket client_socket, int number_of_players, int ID) {
+    public PlayerRunnable(Socket client_socket, int number_of_players, int ID, int cash) {
         this.client_socket = client_socket;
         this.player_hand = new Deck();
         this.number_of_players = number_of_players;
-        this.cash = 300;
+        this.cash = cash;
         this.ID = ID;
     }
 

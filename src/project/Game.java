@@ -11,8 +11,10 @@ public class Game implements Runnable{
     private int pot_cash = 0;
     private int current_call = 0;
     private boolean can_check;
+    private int current_checks = 0;
     private ArrayList<PlayerRunnable> current_round_players;
     private final int MINIMUMBET = 50;
+    private final int STARTING_CASH = 3000;
 
     public Game(ArrayList<Socket> sockets) {
         this.sockets = sockets;
@@ -25,7 +27,7 @@ public class Game implements Runnable{
         Socket sock;
         for (int i = 0; i < this.sockets.size(); i++) {
             sock = this.sockets.get(i);
-            PlayerRunnable new_client = new PlayerRunnable(sock, this.sockets.size(), i);
+            PlayerRunnable new_client = new PlayerRunnable(sock, this.sockets.size(), i, this.STARTING_CASH);
             Thread client_thread = new Thread(new_client);
             client_thread.start(); // Start new thread when client connects
             this.players.add(new_client);
@@ -75,31 +77,7 @@ public class Game implements Runnable{
             } else {
                 playerWins();
             }
-
-            if (current_round_players.size() > 1) {
-                findWinner();
-            }
-
-//            dealMiddleCards(3);
-//            this.can_call = true;
-//            if (current_round_players.size() > 1) {
-//                dealMiddleCards(1);
-//                runRound(current_round_players, 0);
-//                current_round_players = getActivePlayers();
-//            } else {
-//                playerWins();
-//            }
-//            if (current_round_players.size() > 1) {
-//                dealMiddleCards(1);
-//                runRound(current_round_players, 0);
-//            } else {
-//                playerWins();
-//            }
-//            if (current_round_players.size() > 1) {
-//                broadcastMessage("TALLYING CARDS");
-//            } else {
-//                playerWins();
-//            }
+            findWinner();
         }
     }
 
@@ -141,7 +119,9 @@ public class Game implements Runnable{
     }
 
     public void playerWins() {
-        current_round_players.get(0).addMoney(this.pot_cash);
+        PlayerRunnable winner = current_round_players.get(0);
+        broadcastMessage(String.format("PLAYER %d WON THE %d POT", winner.ID, this.pot_cash));
+        winner.addMoney(this.pot_cash);
         this.pot_cash = 0;
     }
 
@@ -159,6 +139,9 @@ public class Game implements Runnable{
 
     public void findWinner() {
         broadcastMessage("FINDING WINNER");
+        if (this.current_round_players.size() == 1) {
+            playerWins();
+        }
     }
 
     public int runPlayer(PlayerRunnable player, int player_index) {
@@ -182,6 +165,7 @@ public class Game implements Runnable{
             return player_index - 1;
         } else if (player_option.startsWith("CHECK")) {
             this.current_round_players.add(this.current_round_players.remove(player_index));
+            this.current_checks++;
             return player_index - 1;
         } else {
             return player_index;
@@ -189,7 +173,12 @@ public class Game implements Runnable{
     }
 
     public void runRound(int from_index) {
+        int max_checks = current_round_players.size();
+        this.current_checks = 0;
         for (int i = from_index; i < current_round_players.size(); i++) {
+            if (this.current_checks >= max_checks || this.current_round_players.size() <= 1) {
+                break;
+            }
             if (current_round_players.size() > 1) {
                 i = runPlayer(current_round_players.get(i), i);
             }
