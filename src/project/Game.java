@@ -66,7 +66,8 @@ public class Game implements Runnable{
                 runRound(0);
                 this.can_check = true;
             } else {
-                playerWins();
+                findWinner();
+                continue;
             }
 
             if (current_round_players.size() > 1) {
@@ -75,7 +76,8 @@ public class Game implements Runnable{
                 runRound(0);
                 this.can_check = true;
             } else {
-                playerWins();
+                findWinner();
+                continue;
             }
             findWinner();
         }
@@ -118,8 +120,7 @@ public class Game implements Runnable{
         this.middle_deck = new Deck();
     }
 
-    public void playerWins() {
-        PlayerRunnable winner = current_round_players.get(0);
+    public void playerWins(PlayerRunnable winner) {
         broadcastMessage(String.format("PLAYER %d WON THE %d POT", winner.ID, this.pot_cash));
         winner.addMoney(this.pot_cash);
         this.pot_cash = 0;
@@ -138,9 +139,11 @@ public class Game implements Runnable{
     }
 
     public void findWinner() {
+        PlayerRunnable winner;
         broadcastMessage("FINDING WINNER");
         if (this.current_round_players.size() == 1) {
-            playerWins();
+            winner = this.current_round_players.get(0);
+            playerWins(winner);
         }
     }
 
