@@ -8,6 +8,12 @@ import java.util.ArrayList;
 public class Main {
 	public static final int PORT_NUMBER = 8080; // Variable for port number
     public static final int MAX_PLAYERS = 4;
+
+    /**
+     * Main method of entire program. Runs all the time and spawns new games when the number of players
+     * is equal to maximum players
+     * @param args Args when run from console
+     */
     public static void main(String[] args) { // Run on start
         ServerSocket server_sock;
         boolean server_active = true;
