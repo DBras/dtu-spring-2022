@@ -76,6 +76,16 @@ public class Deck {
     }
 
     /**
+     * Add all cards from other deck to this one
+     * @param d Deck to add all cards from
+     */
+    public void addAll(Deck d) {
+        for (int i = 0; i < d.getDeckSize(); i++) {
+            this.deck_of_cards.add(d.getCard(i));
+        }
+    }
+
+    /**
      * Returns the deck in String format. Utilises the Card.toString-method
      * @return String representing deck
      */

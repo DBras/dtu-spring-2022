@@ -79,6 +79,15 @@ public class PlayerRunnable implements Runnable{
     }
 
     /**
+     * Returns card at specified index
+     * @param i Index to look at
+     * @return Card object
+     */
+    public Card getCard(int i) {
+        return this.player_hand.getCard(i);
+    }
+
+    /**
      * Make the player bet money. Subtracts bet from player balance and writes bet to socket
      * @param money Money to bet
      */

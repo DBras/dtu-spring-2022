@@ -181,12 +181,28 @@ public class Game implements Runnable{
      * TODO: Calculate hands
      */
     public void findWinner() {
-        PlayerRunnable winner;
+        PlayerRunnable winner = this.current_round_players.get(0); // First player wins by default
         broadcastMessage("FINDING WINNER");
         if (this.current_round_players.size() == 1) { // If only one remains, simply let them win
-            winner = this.current_round_players.get(0);
-            playerWins(winner);
+            playerWins(winner); // First player must win if there is only one
+        } else {
+            HandEvaluator evaluator = new HandEvaluator();
+            int current_high = 0;
+            for (PlayerRunnable player : this.current_round_players) { // For each player still playing
+                Deck tempdeck = new Deck(); // New temporary deck for middle cards and player hand
+                tempdeck.addAll(this.middle_deck);
+                tempdeck.addCard(player.getCard(0));
+                tempdeck.addCard(player.getCard(1)); // Done manually since player only has 2 cards
+
+                int score = evaluator.evaluateSeven(tempdeck); // Get max value of player hand + middle
+                if (score > current_high) {
+                    winner = player; // Winner is set to player with new high
+                    current_high = score; // New high is set
+                }
+            }
+            playerWins(winner); // "Winner" wins the round
         }
+
     }
 
     /**

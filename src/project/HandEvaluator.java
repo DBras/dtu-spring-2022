@@ -13,6 +13,9 @@ public class HandEvaluator {
      * @return Integer representing best score
      */
     public int evaluateSeven(Deck cards) {
+        if (cards.getDeckSize() != 7) {
+            throw new IllegalArgumentException("Deck size is not 7 as expected");
+        }
         int max_score = 0;
         List<int[]> combinations = generate(7, 5); // Use generate()-method to create permutations
         for (int[] combination : combinations) {
