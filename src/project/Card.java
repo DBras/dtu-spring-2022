@@ -37,13 +37,31 @@ public class Card implements Comparable<Card>{
      * @return Integer representing lower, equal or higher (-1, 0 or 1)
      */
     public int compareTo(Card c) {
-        if (this.card_value > c.card_value) {
+        if (this.card_value == 1 || c.card_value == 1) {
+            return c.card_value - this.card_value;
+        } else if (this.card_value > c.card_value) {
             return 1;
         } else if (this.card_value < c.card_value) {
             return -1;
         } else {
             return 0;
         }
+    }
+
+    /**
+     * Getter for card value
+     * @return Integer representing card value
+     */
+    public int getCardValue() {
+        return this.card_value;
+    }
+
+    /**
+     * Getter for suit field
+     * @return String representing card suit
+     */
+    public String getSuit() {
+        return this.suit;
     }
 
     /**
