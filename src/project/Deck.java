@@ -57,11 +57,19 @@ public class Deck {
         return this.deck_of_cards.size();
     }
 
+    public Card getCard(int i) {
+        return this.deck_of_cards.get(i);
+    }
+
     /**
      * Shuffle the deck with Collections.shuffle method
      */
     public void shuffle() {
         Collections.shuffle(this.deck_of_cards);
+    }
+
+    public void sort() {
+        Collections.sort(this.deck_of_cards);
     }
 
     /**
