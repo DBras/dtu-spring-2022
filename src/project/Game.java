@@ -70,6 +70,7 @@ public class Game implements Runnable{
 
             if (current_round_players.size() > 1) { // Stop if only one remains (hasn't folded)
                 dealMiddleCards(1); // Add card to community
+                this.current_call = this.MINIMUMBET; // Reset minimum bet amount
                 runRound(0);
                 this.can_check = true;
                 current_round_players = getActivePlayers();
@@ -80,6 +81,7 @@ public class Game implements Runnable{
 
             if (current_round_players.size() > 1) { // Same as above
                 dealMiddleCards(1);
+                this.current_call = this.MINIMUMBET;
                 runRound(0);
                 this.can_check = true;
             } else {
