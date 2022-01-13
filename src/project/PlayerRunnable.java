@@ -46,11 +46,11 @@ public class PlayerRunnable implements Runnable{
     public void writeToSocket(String message) {
         try {
             BufferedOutputStream bos = new BufferedOutputStream(this.client_socket.getOutputStream());
-            message += "\r\n";
-            bos.write(message.getBytes(StandardCharsets.UTF_8));
-            bos.flush();
+            message += "\r\n"; // Add carriage return to message
+            bos.write(message.getBytes(StandardCharsets.UTF_8)); // Write the bytes
+            bos.flush(); // Flush buffer
         } catch (IOException e) {
-            //
+            e.printStackTrace();
         }
     }
 
@@ -149,18 +149,18 @@ public class PlayerRunnable implements Runnable{
      * @return Return command string
      */
     public String getOption(int current_call, boolean can_check) {
-        this.writeToSocket("YOUR TURN");
+        this.writeToSocket("YOUR TURN"); // Prompt player for option
         Scanner user_input = null;
         String line = "";
-        try {
+        try { // Try to initialise scanner for input stream
             user_input = new Scanner(this.client_socket.getInputStream());
         } catch (IOException e) {
             e.printStackTrace();
         }
-        while (true) {
-            line = user_input.nextLine();
-            String command = line.split(" ")[0];
-            if (command.equals("RAISE")) {
+        while (true) { // Run until player has given option
+            line = user_input.nextLine(); // Read next line
+            String command = line.split(" ")[0]; // Get the first word (the command)
+            if (command.equals("RAISE")) { // If it is a raise, check if raise is large enough and if player has money
                 int bet = Integer.parseInt(line.split(" ")[1]);
                 if (bet > this.cash || bet < current_call) {
                     writeToSocket("INVALID BET");
@@ -168,7 +168,7 @@ public class PlayerRunnable implements Runnable{
                     return line;
                 }
             }
-            else if (command.equals("CALL")) {
+            else if (command.equals("CALL")) { // If player calls, check if player has cash
                 if (current_call > this.cash) {
                     writeToSocket("INVALID BET");
                 }
@@ -176,10 +176,10 @@ public class PlayerRunnable implements Runnable{
                     return line;
                 }
             }
-            else if (command.equals("FOLD")) {
+            else if (command.equals("FOLD")) { // If player folds, send to server
                 return line;
             }
-            else if (command.equals("CHECK") && can_check) {
+            else if (command.equals("CHECK") && can_check) { // If player checks and player CAN check, send to server
                 return line;
             } else {
                 writeToSocket("INVALID OPTION");

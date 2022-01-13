@@ -28,7 +28,7 @@ public class Deck {
         String[] suits = {"Diamonds", "Clubs", "Hearts", "Spades"};
         for (int i = 0; i < suits.length; i++) {
             for (int j = 0; j < 13; j++) {
-                deck_of_cards.add(new Card(suits[i], j+1));
+                deck_of_cards.add(new Card(suits[i], j+1)); // Since card values are 1 to 13, add 1
             }
         }
     }
@@ -68,6 +68,9 @@ public class Deck {
         Collections.shuffle(this.deck_of_cards);
     }
 
+    /**
+     * Sorts the deck using Collections.sort. Cards must implement Comparable interface
+     */
     public void sort() {
         Collections.sort(this.deck_of_cards);
     }

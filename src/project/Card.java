@@ -5,7 +5,7 @@ import java.util.Arrays;
 public class Card implements Comparable<Card>{
     private String suit;
     private int card_value;
-    private final String[] ACCEPTED_SUITS = {"Diamonds", "Clubs", "Hearts", "Spades"};
+    private final String[] ACCEPTED_SUITS = {"Diamonds", "Clubs", "Hearts", "Spades"}; // Only accept these suits
 
     /**
      * Constructor method. Initialises new card if parameters are valid
@@ -13,7 +13,7 @@ public class Card implements Comparable<Card>{
      * @param card_value Integer value from 1 to 13
      */
     public Card(String suit, int card_value) {
-        if (is_valid(suit, card_value)) {
+        if (is_valid(suit, card_value)) { // If inputs are valid, create new card
             this.suit = suit;
             this.card_value = card_value;
         } else {
@@ -28,7 +28,8 @@ public class Card implements Comparable<Card>{
      * @return Boolean representing validity (true is valid)
      */
     private boolean is_valid(String suit, int card_value) {
-        return Arrays.asList(ACCEPTED_SUITS).contains(suit) && card_value > 0 && card_value <=13;
+        return Arrays.asList(ACCEPTED_SUITS).contains(suit) && card_value > 0 && card_value <=13; // Suit is in list,
+                                                                                        // value is between 1 and 13
     }
 
     /**
@@ -37,14 +38,14 @@ public class Card implements Comparable<Card>{
      * @return Integer representing lower, equal or higher (-1, 0 or 1)
      */
     public int compareTo(Card c) {
-        if (this.card_value == 1 || c.card_value == 1) {
-            return c.card_value - this.card_value;
-        } else if (this.card_value > c.card_value) {
+        if (this.card_value == 1 || c.card_value == 1) { // If it is ace, reverse the process
+            return c.card_value - this.card_value; // also returns 0 if both are ace
+        } else if (this.card_value > c.card_value) { // If this card has higher number, that must be higher
             return 1;
-        } else if (this.card_value < c.card_value) {
+        } else if (this.card_value < c.card_value) { // If this is lower, return -1
             return -1;
         } else {
-            return 0;
+            return 0; // Return 0 if cards are equal
         }
     }
 

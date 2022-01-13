@@ -107,15 +107,15 @@ public class Game implements Runnable{
      * @param number number of cards to deal
      */
     public void dealPlayerCards(int number) {
-        for (int i = 0; i < number; i++) {
+        for (int i = 0; i < number; i++) { // Deal 2 cards to each player
             for (int j = 0; j < players.size(); j++) {
                 this.players.get(j).giveCard(this.card_deck.popTopCard());
             }
         }
-        for (int i = 0; i < this.players.size(); i++) {
+        for (int i = 0; i < this.players.size(); i++) { // Write the hand of each player
             this.players.get(i).writeHandToSocket();
         }
-        System.out.println(String.format("After deal deck size: %d", this.card_deck.getDeckSize()));
+        System.out.println(String.format("After deal deck size: %d", this.card_deck.getDeckSize())); // Log deck size
     }
 
     /**
@@ -124,11 +124,11 @@ public class Game implements Runnable{
      * @param number Number of cards to deal
      */
     public void dealMiddleCards(int number) {
-        for (int i = 0; i < number; i++) {
+        for (int i = 0; i < number; i++) { // Deal number of cards while burning every other
             this.card_deck.popTopCard();
             this.middle_deck.addCard(this.card_deck.popTopCard());
         }
-        for (int i = 0; i < this.players.size(); i++) {
+        for (int i = 0; i < this.players.size(); i++) { // Broadcast middle card to all players
             this.players.get(i).writeCardsToSocket(this.middle_deck, "MIDDLE: ");
         }
         System.out.println(String.format("After middle deal deck size: %d", this.card_deck.getDeckSize()));
@@ -139,10 +139,10 @@ public class Game implements Runnable{
      */
     public void resetBoard() {
         ArrayList<PlayerRunnable> alive_players = getAlivePlayers();
-        for (int i = 0; i < alive_players.size(); i++) {
+        for (int i = 0; i < alive_players.size(); i++) { // Empties the hand of all players
             alive_players.get(i).resetHand();
         }
-        this.middle_deck = new Deck();
+        this.middle_deck = new Deck(); // Reset middle decK
     }
 
     /**
@@ -153,7 +153,7 @@ public class Game implements Runnable{
     public void playerWins(PlayerRunnable winner) {
         broadcastMessage(String.format("PLAYER %d WON THE %d POT", winner.ID, this.pot_cash));
         winner.addMoney(this.pot_cash);
-        this.pot_cash = 0;
+        this.pot_cash = 0; // Broadcast winner, add money to winner and reset pot cash
     }
 
     /**
@@ -162,7 +162,7 @@ public class Game implements Runnable{
      */
     public void addToPot(int money) {
         this.pot_cash += money;
-        broadcastMessage(String.format("POT: %d", this.pot_cash));
+        broadcastMessage(String.format("POT: %d", this.pot_cash)); // Add cash to pot
     }
 
     /**
@@ -171,7 +171,7 @@ public class Game implements Runnable{
     public void setAllActive() {
         ArrayList<PlayerRunnable> alive_players = getAlivePlayers();
         for (int i = 0; i < alive_players.size(); i++) {
-            alive_players.get(i).setActiveStatus(true);
+            alive_players.get(i).setActiveStatus(true); // Go through all players and set their status to active
         }
     }
 
@@ -183,8 +183,7 @@ public class Game implements Runnable{
     public void findWinner() {
         PlayerRunnable winner;
         broadcastMessage("FINDING WINNER");
-        System.out.println(this.current_round_players.size());
-        if (this.current_round_players.size() == 1) {
+        if (this.current_round_players.size() == 1) { // If only one remains, simply let them win
             winner = this.current_round_players.get(0);
             playerWins(winner);
         }
@@ -199,29 +198,29 @@ public class Game implements Runnable{
      * @return Integer to keep track of players
      */
     public int runPlayer(PlayerRunnable player, int player_index) {
-        String player_option = player.getOption(this.current_call, this.can_check);
-        if (player_option.startsWith("RAISE")) {
+        String player_option = player.getOption(this.current_call, this.can_check); // Get option from player
+        if (player_option.startsWith("RAISE")) { // If player raises, add bet to pot, broadcast message, and update call
             int bet = Integer.parseInt(player_option.split(" ")[1]);
             player.betMoney(bet);
             addToPot(bet);
             this.current_call = bet;
-            this.can_check = false;
+            this.can_check = false; // Player can no longer check
             return player_index;
-        } else if (player_option.startsWith("CALL")) {
+        } else if (player_option.startsWith("CALL")) { // If player calls, bet the call value
             player.betMoney(this.current_call);
             addToPot(this.current_call);
             this.can_check = false;
             return player_index;
-        } else if (player_option.startsWith("FOLD")) {
+        } else if (player_option.startsWith("FOLD")) { // If player folds, remove from active players
             this.current_round_players.remove(player_index);
             player.setActiveStatus(false);
             this.can_check = false;
-            return player_index - 1;
-        } else if (player_option.startsWith("CHECK")) {
+            return player_index - 1; // Since player has been removed, the next index of player is one lower
+        } else if (player_option.startsWith("CHECK")) { // If player checks, move them to last position
             this.current_round_players.add(this.current_round_players.remove(player_index));
             this.current_checks++;
             return player_index - 1;
-        } else {
+        } else { // If nothing fits, do nothing
             return player_index;
         }
     }
@@ -232,13 +231,13 @@ public class Game implements Runnable{
      * @param from_index Index to start from. Used in the pre-flop
      */
     public void runRound(int from_index) {
-        int max_checks = current_round_players.size();
+        int max_checks = current_round_players.size(); // If every player checks, start next round
         this.current_checks = 0;
-        for (int i = from_index; i < current_round_players.size(); i++) {
+        for (int i = from_index; i < current_round_players.size(); i++) { // Run round for all players from given index
             if (this.current_checks >= max_checks || this.current_round_players.size() <= 1) {
-                break;
+                break; // Break if no players remain or if all players checked
             }
-            if (current_round_players.size() > 1) {
+            if (current_round_players.size() > 1) { // If players remain, broadcast the number of active players and run player
                 broadcastMessage(String.format("Players: %d", current_round_players.size()));
                 i = runPlayer(current_round_players.get(i), i);
             }
@@ -249,28 +248,28 @@ public class Game implements Runnable{
      * Get all players who can actively play the game (cash balance more than minimum bet)
      * @return ArrayList of players that can play
      */
-    public ArrayList<PlayerRunnable> getAlivePlayers() {
-        ArrayList<PlayerRunnable> alive_players = new ArrayList<>();
+    public ArrayList<PlayerRunnable> getAlivePlayers() { // Returns all players with enough money to bet minimum
+        ArrayList<PlayerRunnable> alive_players = new ArrayList<>(); // Initialise empty list of players
         for (int i = 0; i < this.players.size(); i++) {
             if (this.players.get(i).getMoney() > this.MINIMUMBET) {
-                alive_players.add(players.get(i));
+                alive_players.add(players.get(i)); // Add player if they have money
             }
         }
-        return alive_players;
+        return alive_players; // Returns list of all alive players
     }
 
     /**
      * Get players that have not folded their hand
      * @return ArrayList of players ready to play
      */
-    public ArrayList<PlayerRunnable> getActivePlayers() {
+    public ArrayList<PlayerRunnable> getActivePlayers() { // Get list of al players with status set to "active"
         ArrayList<PlayerRunnable> active_players = new ArrayList<>();
-        ArrayList<PlayerRunnable> alive_players = getAlivePlayers();
+        ArrayList<PlayerRunnable> alive_players = getAlivePlayers(); // Only check players who are alive
         for (int i = 0; i < alive_players.size(); i++) {
             if (alive_players.get(i).getActiveStatus()) {
                 active_players.add(alive_players.get(i));
             }
         }
-        return active_players;
+        return active_players; // Returns all active players
     }
 }
