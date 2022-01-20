@@ -70,6 +70,28 @@ public class Main {
         }
     }
 
+    /**
+     * Method for encrypting an array of bytes using an LCG
+     * @param data Array of bytes to be en-/decrypted
+     * @return Array of bytes that has been en-/decrypted
+     */
+    public static byte[] encrypt(byte[] data) {
+        BigInteger x = new BigInteger("00123456", 16), // Key
+                a = new BigInteger("125"), // Value a used in LCG
+                c = new BigInteger("1"), // Value c used in LCG
+                mod_val = new BigInteger("16777216"), // Value of 2^24
+                keybyte, temp; // Keybyte and temp variables used to en-/decrypt with XOR
+
+        for (int i = 0; i < data.length; i++) { // Run loop for all elements of data
+            x = (x.multiply(a).add(c)).mod(mod_val); // Calculate new value of x
+            keybyte = x.shiftRight(8);
+            temp = keybyte.shiftRight(8).shiftLeft(8);
+            keybyte = keybyte.subtract(temp); // 3 lines used to extract the second LSB from x
+            data[i] = (byte) (data[i] ^ keybyte.byteValue()); // XOR data byte with key byte
+        }
+        return data;
+    }
+
     public static void main(String[] args) {
         byte[] B = {(byte)0x12, (byte)0x34, (byte)0x56, (byte)0x78, (byte)0x9A, (byte)0xBC, (byte)0xDE};
         System.out.println(Integer.toHexString(fletcher16(B))); // Skal printe værdien 714b
@@ -86,5 +108,12 @@ public class Main {
         BigInteger second = new BigInteger(Arrays.copyOfRange(response, 16, response.length));
         System.out.println(first);
         System.out.println(second);
+
+        System.out.println(Arrays.toString(B));
+        byte[] testb = encrypt(B);
+        System.out.println(Arrays.toString(testb));
+        testb = encrypt(testb);
+        System.out.println(Arrays.toString(testb));
+
     }
 }
