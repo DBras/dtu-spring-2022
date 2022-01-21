@@ -5,6 +5,7 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.Random;
 
@@ -20,7 +21,7 @@ public class Main {
     /**
      * Calculate fletcher16 checksum of a byte array
      * @param data Byte array to calculate from
-     * @return Integer of checksum
+     * @return BigInteger of checksum
      */
     public static BigInteger fletcher16(byte[] data) {
         int control_sum;
@@ -68,20 +69,13 @@ public class Main {
         tl_payload[1] = (byte) L_field;
         System.arraycopy(payload_array, 0, tl_payload, 2, L_field - 2);
         BigInteger client_fcs_big = fletcher16(tl_payload); // Calculate FCS
-
-        String server_fcs = "";
-        for (byte b : server_fcs_array) { // Convert server FCS field to hex-string
-            server_fcs += Integer.toHexString(b & 0xff); // Convert to unsigned with & 0xff
-        }
-
-        String client_fcs = client_fcs_big.toString(16);
-        if (server_fcs.equals(client_fcs) && expected_type == T_field) {
+        BigInteger server_fcs_big = new BigInteger(server_fcs_array); // Convert array to BigInteger
+        if ((server_fcs_big.equals(client_fcs_big) || // If they are equal or subtracted give 65536
+                client_fcs_big.subtract(server_fcs_big).equals(BigInteger.valueOf(65536))) // Necessary since server_fcs is signed
+                && expected_type == T_field) { // Expected t field must be equal
             return payload_array; // Returns if the type is as expected and the checksum is the same
         } else {
-            System.out.println(client_fcs);
-            System.out.println(server_fcs);
-            //throw new RuntimeException("FCS or expected return type do not match");
-            return payload_array;
+            throw new RuntimeException("FCS or expected return type do not match");
         }
     }
 
@@ -106,49 +100,63 @@ public class Main {
         return data;
     }
 
-    public static void sendToServer(byte[] payload) {
-        int T = 2, len = payload.length+2;
+    /**
+     * Method for sending to server. Encrypts the data using encrypt()-method if necessary. Sends T, L, Payload, and FCS
+     * @param payload Byte array of payload (eg. a String represented as bytes)
+     * @param T Integer representing T value (2 for client hello, 3 for game data)
+     * @param should_be_encrypted Boolean. True if data should be encryped
+     */
+    public static void sendToServer(byte[] payload, int T, boolean should_be_encrypted) {
+        int len = payload.length+2; // length of payload + FCS
         byte[] checksum_fields = new byte[len];
         checksum_fields[0] = (byte) T;
         checksum_fields[1] = (byte) len;
-        System.arraycopy(payload, 0, checksum_fields, 2, 16);
+        System.arraycopy(payload, 0, checksum_fields, 2, payload.length); // Populate array to calculate FCS
         BigInteger fcs = new BigInteger(String.valueOf(fletcher16(checksum_fields)));
-        byte[] fcs_array = fcs.toByteArray();
-        if (fcs_array.length == 3) {
+        byte[] fcs_array = fcs.toByteArray(); // Get byte array of the checksum
+        if (fcs_array.length == 3) { // Sometimes the array has a 0-byte in front
             byte[] tmp = new byte[2];
             tmp[0] = fcs_array[1];
             tmp[1] = fcs_array[2];
             fcs_array = tmp;
         }
+        if (should_be_encrypted) { // Encrypt payload + FCS if necessary
+            payload = encrypt(payload);
+            fcs_array = encrypt(fcs_array);
+        }
         byte[] to_send = new byte[4+payload.length];
-        to_send[0] = 2;
-        to_send[1] = 18;
-        System.arraycopy(payload, 0, to_send, 2, payload.length);
+        to_send[0] = (byte) T;
+        to_send[1] = (byte) len;
+        System.arraycopy(payload, 0, to_send, 2, payload.length); // Populate total array to send
         System.arraycopy(fcs_array, 0, to_send, to_send.length-2, 2);
         try {
-            bos.write(to_send);
+            bos.write(to_send); // to_send contains T, L, Payload, and FCS
             bos.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     * Method for initialising Diffie Hellman sequence. Stores the final key in private field and returns nothing
+     * Also initialises the x-value used in the LCG (encrypt()-method)
+     */
     public static void initialiseDiffie() {
         byte[] key_values = getPayload(1, false);
         BigInteger g = new BigInteger(Arrays.copyOfRange(key_values, 0, 16));
         BigInteger p = new BigInteger(Arrays.copyOfRange(key_values, 16, 32));
         BigInteger A = new BigInteger(Arrays.copyOfRange(key_values, 32, 48));
-        BigInteger b;
+        BigInteger b; // Gets value from server and initialises b-parameter
         do {
-            b = new BigInteger(16, rnd);
+            b = new BigInteger(16, rnd); // Creates a random number of 16 bits greater than 0
         } while (b.intValue() <= 0);
         BigInteger B = g.pow(b.intValue()).mod(p);
-        BigInteger client_key = A.pow(b.intValue()).mod(p);
+        BigInteger client_key = A.pow(b.intValue()).mod(p); // Calculate g^a mod p and then the key
         byte[] B_array = B.toByteArray();
-        sendToServer(B_array);
+        sendToServer(B_array, 2, false); // Send B parameter to server
         System.out.println("Handshake complete");
         key = client_key;
-        x = key.subtract(key.shiftRight(24).shiftLeft(24));
+        x = key.subtract(key.shiftRight(24).shiftLeft(24)); // Set x to 24 LSB from key
     }
 
     public static void main(String[] args) {
@@ -162,6 +170,14 @@ public class Main {
 
         initialiseDiffie();
         byte[] next_line = getPayload(3, true);
+        System.out.println(new String(next_line));
+        next_line = getPayload(3, true);
+        System.out.println(new String(next_line));
+        next_line = getPayload(3, true);
+        System.out.println(new String(next_line));
+
+        sendToServer("1".getBytes(StandardCharsets.UTF_8), 3, true);
+        next_line = getPayload(3, true);
         System.out.println(new String(next_line));
     }
 }
