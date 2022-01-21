@@ -10,7 +10,7 @@ import java.util.Random;
 
 public class Main {
     private static final String URL = "ftnk-ctek01.win.dtu.dk";
-    private static final int PORT = 1062;
+    private static final int PORT = 1063;
     private static Socket sock;
     private static BufferedInputStream bis;
     private static BufferedOutputStream bos;
@@ -45,7 +45,7 @@ public class Main {
      * @param expected_type Integer of the expected type of server response
      * @return Byte array of the payload field in server response
      */
-    public static byte[] getPayload(int expected_type) {
+    public static byte[] getPayload(int expected_type, boolean should_be_decrypted) {
         int T_field = 0, L_field = 0; // Declare variables which are defined in try-block
         byte[] payload_array = null, tl_payload = null, server_fcs_array = null;
         try { // For catching IOExceptions in the .read()-calls
@@ -59,23 +59,29 @@ public class Main {
             e.printStackTrace();
             System.exit(1);
         }
+        if (should_be_decrypted) {
+            payload_array = encrypt(payload_array);
+            server_fcs_array = encrypt(server_fcs_array);
+        }
+
         tl_payload[0] = (byte) T_field; // Add everything to the T, L & Payload array
         tl_payload[1] = (byte) L_field;
         System.arraycopy(payload_array, 0, tl_payload, 2, L_field - 2);
+        BigInteger client_fcs_big = fletcher16(tl_payload); // Calculate FCS
 
         String server_fcs = "";
         for (byte b : server_fcs_array) { // Convert server FCS field to hex-string
             server_fcs += Integer.toHexString(b & 0xff); // Convert to unsigned with & 0xff
         }
 
-        BigInteger client_fcs_big = fletcher16(tl_payload); // Calculate FCS
         String client_fcs = client_fcs_big.toString(16);
         if (server_fcs.equals(client_fcs) && expected_type == T_field) {
             return payload_array; // Returns if the type is as expected and the checksum is the same
         } else {
             System.out.println(client_fcs);
             System.out.println(server_fcs);
-            throw new RuntimeException("FCS or expected return type do not match");
+            //throw new RuntimeException("FCS or expected return type do not match");
+            return payload_array;
         }
     }
 
@@ -85,7 +91,6 @@ public class Main {
      * @return Array of bytes that has been en-/decrypted
      */
     public static byte[] encrypt(byte[] data) {
-        x = new BigInteger("00123456", 16);
         BigInteger a = new BigInteger("125"), // Value a used in LCG
                 c = new BigInteger("1"), // Value c used in LCG
                 mod_val = new BigInteger("16777216"), // Value of 2^24
@@ -118,9 +123,8 @@ public class Main {
         byte[] to_send = new byte[4+payload.length];
         to_send[0] = 2;
         to_send[1] = 18;
-        System.arraycopy(payload, 0, to_send, 2, 16);
+        System.arraycopy(payload, 0, to_send, 2, payload.length);
         System.arraycopy(fcs_array, 0, to_send, to_send.length-2, 2);
-        //System.out.println(Arrays.toString(to_send));
         try {
             bos.write(to_send);
             bos.flush();
@@ -130,8 +134,7 @@ public class Main {
     }
 
     public static void initialiseDiffie() {
-        byte[] key_values = getPayload(1);
-        //System.out.println(key_values.length);
+        byte[] key_values = getPayload(1, false);
         BigInteger g = new BigInteger(Arrays.copyOfRange(key_values, 0, 16));
         BigInteger p = new BigInteger(Arrays.copyOfRange(key_values, 16, 32));
         BigInteger A = new BigInteger(Arrays.copyOfRange(key_values, 32, 48));
@@ -142,19 +145,10 @@ public class Main {
         BigInteger B = g.pow(b.intValue()).mod(p);
         BigInteger client_key = A.pow(b.intValue()).mod(p);
         byte[] B_array = B.toByteArray();
-        //System.out.println(Arrays.toString(B_array));
         sendToServer(B_array);
         System.out.println("Handshake complete");
         key = client_key;
-
-       /* byte[] key_payload = getPayload(3);
-        BigInteger server_key = new BigInteger(key_payload);
-        System.out.println(String.format("Server key: %s", server_key.toString(16)));
-
-        if (client_key.equals(server_key)) {
-            key = server_key;
-            System.out.println("Handshake completed");
-        }*/
+        x = key.subtract(key.shiftRight(24).shiftLeft(24));
     }
 
     public static void main(String[] args) {
@@ -167,25 +161,7 @@ public class Main {
         }
 
         initialiseDiffie();
-        byte[] key_payload = getPayload(3);
-        BigInteger server_key = new BigInteger(key_payload);
-        System.out.printf("Server key: %s%n", server_key.toString(16));
-
-        if (key.equals(server_key)) {
-            System.out.println("Keys match");
-        }
-
-/*        byte[] response = getPayload(3);
-        BigInteger first = new BigInteger(Arrays.copyOfRange(response, 0, 16));
-        BigInteger second = new BigInteger(Arrays.copyOfRange(response, 16, response.length));
-        System.out.println(first);
-        System.out.println(second);
-
-        System.out.println(Arrays.toString(B));
-        byte[] testb = encrypt(B);
-        System.out.println(Arrays.toString(testb));
-        testb = encrypt(testb);
-        System.out.println(Arrays.toString(testb)); */
-
+        byte[] next_line = getPayload(3, true);
+        System.out.println(new String(next_line));
     }
 }
